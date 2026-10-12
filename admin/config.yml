@@ -1,0 +1,51 @@
+backend:
+  name: github
+  repo: jmudya/carbase
+  branch: main
+
+media_folder: uploads
+public_folder: /uploads
+
+collections:
+  - name: site
+    label: Website
+    files:
+      - name: cars
+        label: Cars
+        file: data/cars.json
+        fields:
+          - label: Cars
+            name: cars
+            widget: list
+            label_singular: Car
+            summary: "{{fields.y}} {{fields.b}} {{fields.m}}"
+            fields:
+              - {label: Brand, name: b, widget: string}
+              - {label: Model, name: m, widget: string}
+              - {label: Year, name: y, widget: number, value_type: int}
+              - {label: Body type, name: t, widget: select, options: [Sedan, SUV, Truck, Coupe, EV]}
+              - {label: Mileage, name: mi, widget: number, value_type: int}
+              - {label: Price in USD, name: p, widget: number, value_type: int}
+              - {label: Sold, name: sold, widget: boolean, default: false, required: false}
+              - {label: Engine, name: e, widget: string, required: false}
+              - {label: Transmission, name: tr, widget: string, required: false}
+              - {label: Drivetrain, name: dr, widget: string, required: false}
+              - {label: Exterior color, name: c, widget: string, required: false}
+              - {label: Video link (YouTube, TikTok, Facebook or Instagram), name: v, widget: string, required: false}
+              - label: Photos (up to 20, the first one is the cover)
+                name: imgs
+                widget: list
+                required: false
+                max: 20
+                field: {label: Photo, name: photo, widget: image}
+      - name: settings
+        label: Contacts and links
+        file: data/settings.json
+        fields:
+          - {label: "Phone numbers (separate with | )", name: ph, widget: string, required: false}
+          - {label: Email, name: em, widget: string, required: false}
+          - {label: Opening hours, name: hr, widget: string, required: false}
+          - {label: Facebook link, name: fb, widget: string, required: false}
+          - {label: Instagram link, name: ig, widget: string, required: false}
+          - {label: TikTok link, name: tt, widget: string, required: false}
+          - {label: YouTube link, name: yt, widget: string, required: false}
