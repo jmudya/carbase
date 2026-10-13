@@ -28,6 +28,11 @@ collections:
               - {label: Price in USD, name: p, widget: number, value_type: int}
               - {label: Sold, name: sold, widget: boolean, default: false, required: false}
               - {label: Engine, name: e, widget: string, required: false}
+              - {label: VIN, name: vin, widget: string, required: false}
+              - {label: Horsepower, name: hp, widget: number, value_type: int, required: false}
+              - {label: Fuel type, name: fuel, widget: select, options: [Gasoline, Diesel, Hybrid, Plug-in hybrid, Electric], required: false}
+              - {label: Title (shown next to the price), name: title, widget: select, options: [Clean, Rebuilt], required: false}
+              - {label: CARFAX report (PDF file), name: carfax, widget: file, required: false}
               - {label: Transmission, name: tr, widget: string, required: false}
               - {label: Drivetrain, name: dr, widget: string, required: false}
               - {label: Exterior color, name: c, widget: string, required: false}

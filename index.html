@@ -150,6 +150,20 @@ header .wrap.top{height:auto;max-width:1240px;padding-top:14px;padding-bottom:14
 .wrap.lb2{max-width:1240px;display:flex;justify-content:flex-end;gap:4px;padding-top:5px;padding-bottom:5px}
 .lb2 button{display:inline-flex;align-items:center;gap:6px;font:600 13px var(--body);color:var(--muted);background:none;border:1px solid transparent;border-radius:4px;padding:3px 10px;cursor:pointer}
 .lb2 button[aria-pressed=true]{color:#fff;background:var(--panel);border-color:var(--line)}
+#ask,#cfbtn{flex:1 1 100%;width:100%;text-align:center;margin-left:0}
+.dprice{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.ttl{font:600 13px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ttl.rb{color:#ffb020}
+dialog#cf{width:100%;max-width:none;height:100%;max-height:none;margin:0;padding:0;border:0;border-radius:0;background:#0b0c0e;overflow:hidden}
+dialog#cf[open]{display:flex;flex-direction:column}
+.cfh,.cff{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:#000}
+.cfh{padding-top:calc(10px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line)}
+.cff{padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);justify-content:center}
+.cfh strong{font:900 22px var(--head);letter-spacing:.06em}
+.cfx{margin:0;padding:10px 22px}
+.cfb{flex:1;overflow:auto;padding:12px;text-align:center}
+.cfp{display:block;margin:0 auto 12px;background:#fff;max-width:100%}
+.cfm{color:var(--muted);padding:40px 0}.cfm a{color:#fff}
 @media(max-width:520px){nav{gap:14px;font-size:15px}.btn.alt{margin:10px 0 0}}
 </style>
 </head>
@@ -207,7 +221,7 @@ header .wrap.top{height:auto;max-width:1240px;padding-top:14px;padding-bottom:14
 <div class="dprice" id="dp" data-render=""></div>
 <div id="dvid" data-render=""></div>
 <dl id="dl" data-render=""></dl>
-<div class="row"><button type="button" class="btn" id="ask" data-i="ask">Ask about this car</button></div>
+<div class="row"><button type="button" class="btn" id="ask" data-i="ask">Ask about this car</button><button type="button" class="btn alt" id="cfbtn" data-i="getcf" hidden>Get CARFAX</button></div>
 <div id="qf" data-render=""></div>
 </div></dialog>
 
@@ -222,6 +236,7 @@ header .wrap.top{height:auto;max-width:1240px;padding-top:14px;padding-bottom:14
 <p class="note" id="stmsg" data-render=""></p></div></dialog>
 
 <dialog id="lb" aria-label="Photo viewer"><button type="button" class="lbb lbx" id="lbx" aria-label="Close">×</button><button type="button" class="lbb lbp" id="lbp" aria-label="Previous photo">‹</button><div id="lbw" data-render=""></div><button type="button" class="lbb lbf" id="lbf" aria-label="Next photo">›</button><div id="lbc" data-render=""></div></dialog>
+<dialog id="cf" aria-label="CARFAX report"><div class="cfh"><strong>CARFAX</strong><button type="button" class="btn alt cfx" data-cfx data-i="close">Close</button></div><div class="cfb" id="cfb" data-render=""></div><div class="cff"><button type="button" class="btn alt cfx" data-cfx data-i="close">Close</button></div></dialog>
 <footer><div class="wrap"><div class="social" data-render="" data-soc=""></div><p style="margin:0 0 8px">705 Live Oak St, Unit J, Tarpon Springs, FL 34689</p><span data-i="foot">© 2026 CarBase LLC. All rights reserved. Prices and availability subject to change.</span></div></footer>
 
 <script>
@@ -295,10 +310,10 @@ el.onclick=function(){sel=b;chipsDraw();draw()};chips.appendChild(el)})}
 function openCar(i){
 var c=cars[i];last=document.activeElement;
 document.getElementById("dt").textContent=c.y+" "+c.b+" "+c.m;
-cur=c;gal(c,0);G("qf").innerHTML="";G("ask").textContent=c.sold?ts("ask2"):ts("ask");
+cur=c;gal(c,0);G("qf").innerHTML="";G("ask").textContent=c.sold?ts("ask2"):ts("ask");G("cfbtn").hidden=!c.carfax;
 document.getElementById("dvid").innerHTML=c.v?'<a class="btn alt" style="margin:0 0 14px" href="'+url(c.v)+'" target="_blank" rel="noopener">&#9654; '+ts("video")+'</a>':"";
-document.getElementById("dp").textContent="$"+fmt(c.p);
-var rows=[[ts("r_y"),c.y],[ts("r_b"),c.b],[ts("r_m"),c.m],[ts("r_t"),tg("ty",c.t)],[ts("r_mi"),fmt(c.mi)+" "+ts("mi")],[ts("r_e"),c.e],[ts("r_tr"),tg("tr",c.tr)],[ts("r_dr"),c.dr],[ts("r_c"),tg("co",c.c)]];
+document.getElementById("dp").innerHTML="<span>$"+fmt(c.p)+"</span>"+(c.title?'<span class="ttl'+(c.title==="Rebuilt"?" rb":"")+'">'+ts("title")+": "+tg("ti",c.title)+"</span>":"");
+var rows=[[ts("r_y"),c.y],[ts("r_b"),c.b],[ts("r_m"),c.m],c.vin&&["VIN",c.vin],[ts("r_t"),tg("ty",c.t)],[ts("r_mi"),fmt(c.mi)+" "+ts("mi")],[ts("r_e"),c.e],c.hp&&[ts("r_hp"),fmt(+c.hp)+" hp"],c.fuel&&[ts("r_fu"),tg("fu",c.fuel)],[ts("r_tr"),tg("tr",c.tr)],[ts("r_dr"),c.dr],[ts("r_c"),tg("co",c.c)]].filter(Boolean);
 document.getElementById("dl").innerHTML=rows.map(function(r){return"<dt>"+r[0]+"</dt><dd>"+r[1]+"</dd>"}).join("");
 dlg.showModal()}
 grid.addEventListener("click",function(e){var a=e.target.closest(".card");if(a)open2(a.dataset.i)});
@@ -413,6 +428,20 @@ var tx=0;
 G("lb").addEventListener("touchstart",function(e){tx=e.touches[0].clientX},{passive:true});
 G("lb").addEventListener("touchend",function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50&&lbA.length>1)lbShow(lbK+(d<0?1:-1))},{passive:true});
 var ES={"q_fail":"No se pudo enviar la solicitud. Por favor, llámenos.","q_thanks":"¡Gracias! Recibimos su solicitud y nos pondremos en contacto pronto.","nav_home": "Inicio", "nav_inv": "Inventario", "nav_about": "Nosotros", "nav_contact": "Contacto", "hero": "Camionetas, autos y vehículos eléctricos usados, inspeccionados y a precio justo. Tarpon Springs, Florida.", "browse": "Ver inventario", "visit": "Visítenos", "inv_h": "Inventario", "inv_sub": "Elija una marca para ver lo que tenemos disponible.", "all": "Todos", "about_h": "Nosotros", "about1": "CarBase es un concesionario de autos usados y taller en Tarpon Springs, Florida. Compramos, inspeccionamos y vendemos camionetas, autos y vehículos eléctricos de las marcas en las que más confían los conductores.", "about2": "Cada auto se revisa antes de salir a la venta y le decimos con claridad lo que encontramos. Usted recibe un precio claro, el historial completo del vehículo y cero presión.", "about3": "¿Busca algo en particular? Díganos la marca, el presupuesto y el año, y lo conseguimos para usted.", "f1b": "Camionetas, autos y eléctricos", "f1s": "Un solo lote, todo tipo de carrocería", "f2b": "Inspección en nuestro propio taller", "f2s": "Reparamos lo necesario antes de que usted compre", "f3b": "Búsqueda bajo pedido", "f3s": "Encontramos el auto que usted quiere", "contact_h": "Visítenos", "directions": "Cómo llegar", "foot": "© 2026 CarBase LLC. Todos los derechos reservados. Precios y disponibilidad sujetos a cambios.", "ask": "Preguntar por este auto", "ask2": "Preguntar por autos similares", "sales": "VENTAS", "email": "CORREO", "call": "Llamar", "video": "Ver video", "details": "Detalles", "sold": "Vendido", "mi": "mi", "r_y": "Año", "r_b": "Marca", "r_m": "Modelo", "r_t": "Carrocería", "r_mi": "Millaje", "r_e": "Motor", "r_tr": "Transmisión", "r_dr": "Tracción", "r_c": "Color", "q_name": "Su nombre", "q_email": "Su correo electrónico", "q_msg": "Mensaje (opcional)", "q_send": "Enviar solicitud", "q_err": "Ingrese su nombre y un correo electrónico válido.", "q_ok": "Se abrirá su aplicación de correo. Presione Enviar allí para terminar.", "q_na": "Las solicitudes en línea aún no están disponibles. Por favor, llámenos.", "ty:Sedan": "Sedán", "ty:SUV": "SUV", "ty:Truck": "Camioneta", "ty:Coupe": "Cupé", "ty:EV": "Eléctrico", "co:Silver": "Plata", "co:White": "Blanco", "co:Blue": "Azul", "co:Gray": "Gris", "co:Black": "Negro", "co:Red": "Rojo", "tr:Automatic": "Automática", "tr:Single-speed": "Una velocidad"};for(var k in ES)D.es[k]=ES[k];
+ad("getcf","Get CARFAX","Отримати CARFAX","Получить CARFAX");ad("close","Close","Закрити","Закрыть");ad("loading","Loading...","Завантаження...","Загрузка...");ad("openpdf","Open the report","Відкрити звіт","Открыть отчёт");
+ad("title","Title","Тайтл","Тайтл");ad("r_hp","Horsepower","Потужність","Мощность");ad("r_fu","Fuel","Паливо","Топливо");
+ad("ti:Clean","Clean","Clean","Clean");ad("ti:Rebuilt","Rebuilt","Rebuilt","Rebuilt");
+ad("fu:Gasoline","Gasoline","Бензин","Бензин");ad("fu:Diesel","Diesel","Дизель","Дизель");ad("fu:Hybrid","Hybrid","Гібрид","Гибрид");ad("fu:Plug-in hybrid","Plug-in hybrid","Плагін-гібрид","Плагин-гибрид");ad("fu:Electric","Electric","Електро","Электро");
+var ES2={"getcf":"Obtener CARFAX","close":"Cerrar","loading":"Cargando...","openpdf":"Abrir el informe","title":"Título","r_hp":"Caballos de fuerza","r_fu":"Combustible","ti:Clean":"Limpio","ti:Rebuilt":"Reconstruido","fu:Gasoline":"Gasolina","fu:Diesel":"Diésel","fu:Hybrid":"Híbrido","fu:Plug-in hybrid":"Híbrido enchufable","fu:Electric":"Eléctrico"};for(var k in ES2)D.es[k]=ES2[k];
+var pdfP=null;
+function loadPdfjs(){return pdfP||(pdfP=new Promise(function(ok,no){var s=document.createElement("script");s.src="/vendor/pdf.min.js";s.onload=function(){pdfjsLib.GlobalWorkerOptions.workerSrc="/vendor/pdf.worker.min.js";ok()};s.onerror=no;document.head.appendChild(s)}))}
+function openCarfax(u){var b=G("cfb");b.innerHTML='<p class="cfm">'+ts("loading")+'</p>';G("cf").showModal();
+loadPdfjs().then(function(){return pdfjsLib.getDocument(u).promise}).then(async function(pdf){b.innerHTML="";var r=window.devicePixelRatio||1,w=Math.min(b.clientWidth-24,900);
+for(var i=1;i<=pdf.numPages;i++){var pg=await pdf.getPage(i),v0=pg.getViewport({scale:1}),vp=pg.getViewport({scale:w/v0.width*r}),cv=document.createElement("canvas");cv.width=vp.width;cv.height=vp.height;cv.style.width=Math.round(vp.width/r)+"px";cv.className="cfp";b.appendChild(cv);await pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise}})
+.catch(function(){b.innerHTML='<p class="cfm"><a href="'+u+'" target="_blank" rel="noopener">'+ts("openpdf")+'</a></p>'})}
+G("cfbtn").onclick=function(){if(cur&&cur.carfax)openCarfax(cur.carfax)};
+document.querySelectorAll("[data-cfx]").forEach(function(b){b.onclick=function(){G("cf").close()}});
+G("cf").addEventListener("close",function(){G("cfb").innerHTML=""});
 function applyLang(){
 document.documentElement.lang={en:"en",es:"es",ua:"uk",ru:"ru"}[L];
 document.querySelectorAll("[data-i]").forEach(function(e){e.textContent=ts(e.dataset.i)});
