@@ -45,7 +45,9 @@
     {
       "b": "Ford",
       "c": "Gray",
-      "e": "5l",
+      "e": "5.0 litrs",
+      "hp": 400,
+      "carfax": "/uploads/ford-f150-2023-1ftew1c55pkd73809.pdf",
       "m": "F-150 XLT Pickup 4D 5 1/2 ft",
       "dr": "RWD",
       "p": 27000,
@@ -74,8 +76,11 @@
       "t": "Truck",
       "sold": false,
       "v": "",
+      "fuel": "Gasoline",
+      "title": "Clean",
       "y": 2023,
-      "mi": 66998,
+      "vin": "5.0L V8 F DOHC 32V",
+      "mi": 39700,
       "tr": "Automatic"
     },
     {
