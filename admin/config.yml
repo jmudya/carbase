@@ -49,3 +49,4 @@ collections:
           - {label: Instagram link, name: ig, widget: string, required: false}
           - {label: TikTok link, name: tt, widget: string, required: false}
           - {label: YouTube link, name: yt, widget: string, required: false}
+          - {label: "Form email access key (from web3forms.com)", name: wk, widget: string, required: false}
