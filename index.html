@@ -184,7 +184,7 @@ dialog#cf[open]{display:flex;flex-direction:column}
 .ab b{font:900 18px var(--head);letter-spacing:.14em}
 .ab.more b{font:600 14px var(--body);letter-spacing:.04em;color:var(--muted)}
 .ab img{height:30px;width:auto;max-width:140px;display:block}
-.ab[data-a=iaai] img{height:42px}.ab[data-a=manheim] img{height:44px}.ab[data-a=adesa] img{height:26px}.ab[data-a=copart] img{height:36px}
+.ab[data-a=pipeline] img{height:38px}.ab[data-a=iaai] img{height:42px}.ab[data-a=manheim] img{height:44px}.ab[data-a=adesa] img{height:26px}.ab[data-a=copart] img{height:36px}
 .ab.hasimg{background:#fff}.ab.hasimg b{display:none}
 .aucn{margin-top:10px;font-size:13px;color:var(--muted)}
 .srv{display:grid;grid-template-columns:1fr;gap:16px}
@@ -217,6 +217,18 @@ dialog#cf[open]{display:flex;flex-direction:column}
 .abl b{display:none;color:#111;font:900 20px var(--head);letter-spacing:.12em}
 .row2{display:grid;grid-template-columns:1fr;gap:0 16px}
 @media(min-width:800px){.row2{grid-template-columns:1fr 1fr}}
+.row3{display:grid;grid-template-columns:1fr;gap:0 16px}
+@media(min-width:800px){.row3{grid-template-columns:1fr 1fr 1fr}}
+.req .hint{margin:-4px 0 14px}
+#qf .hint{margin:-4px 0 12px}
+dialog#ty{width:min(560px,calc(100% - 32px));padding:0;border:1px solid var(--line);border-radius:14px;background:#1b1f25;color:#fff;overflow:hidden}
+dialog#ty::backdrop{background:rgba(0,0,0,.72)}
+.tyb{padding:44px 30px 40px;text-align:center;animation:typop .35s ease-out}
+.tyc{width:88px;height:88px;margin:0 auto 20px;border-radius:50%;background:#2fbf71;color:#fff;display:flex;align-items:center;justify-content:center}
+.tyc svg{width:50px;height:50px}
+.tyb h2{margin:0 0 10px;font:900 clamp(44px,12vw,72px)/1 var(--head);text-transform:uppercase;letter-spacing:.02em}
+.tyb p{margin:0;font-size:19px;color:#c4ccd6}
+@keyframes typop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
 @media(max-width:520px){nav{gap:14px;font-size:15px}.btn.alt{margin:10px 0 0}}
 </style>
 <script>function lg(i){if(!i.dataset.t){i.dataset.t=1;i.src="/logos/"+i.parentNode.dataset.a+".svg"}else i.remove()}</script>
@@ -253,7 +265,7 @@ dialog#cf[open]{display:flex;flex-direction:column}
 <p data-i="about3">Looking for something specific? Tell us the brand, budget and year, and we will source it for you.</p>
 <p data-i="about4">We also work with the major U.S. auction platforms, including Manheim, Copart, IAAI and Adesa, as well as other auctions.</p>
 <div class="auc-h" data-i="auc_h">Auctions we work with</div>
-<div class="auc"><span class="ab" data-a="manheim"><img src="/logos/manheim.png" alt="" onload="this.parentNode.classList.add('hasimg')" onerror="lg(this)"><b>MANHEIM</b></span><span class="ab" data-a="copart"><img src="/logos/copart.png" alt="" onload="this.parentNode.classList.add('hasimg')" onerror="lg(this)"><b>COPART</b></span><span class="ab" data-a="iaai"><img src="/logos/iaai.png" alt="" onload="this.parentNode.classList.add('hasimg')" onerror="lg(this)"><b>IAAI</b></span><span class="ab" data-a="adesa"><img src="/logos/adesa.png" alt="" onload="this.parentNode.classList.add('hasimg')" onerror="lg(this)"><b>ADESA</b></span><span class="ab more"><b data-i="auc_more">And others</b></span></div>
+<div class="auc"><span class="ab" data-a="manheim"><img src="/logos/manheim.png" alt="" onload="this.parentNode.classList.add('hasimg')" onerror="lg(this)"><b>MANHEIM</b></span><span class="ab" data-a="copart"><img src="/logos/copart.png" alt="" onload="this.parentNode.classList.add('hasimg')" onerror="lg(this)"><b>COPART</b></span><span class="ab" data-a="iaai"><img src="/logos/iaai.png" alt="" onload="this.parentNode.classList.add('hasimg')" onerror="lg(this)"><b>IAAI</b></span><span class="ab" data-a="adesa"><img src="/logos/adesa.png" alt="" onload="this.parentNode.classList.add('hasimg')" onerror="lg(this)"><b>ADESA</b></span><span class="ab" data-a="pipeline"><img src="/logos/pipeline.png" alt="Edge Pipeline" onload="this.parentNode.classList.add('hasimg')" onerror="lg(this)"><b>EDGE PIPELINE</b></span><span class="ab more"><b data-i="auc_more">And others</b></span></div>
 <p class="aucn" data-i="auc_note">All names and logos are trademarks of their respective owners.</p>
 </div>
 <ul class="facts">
@@ -273,8 +285,8 @@ dialog#cf[open]{display:flex;flex-direction:column}
 <div class="aucrow"><span class="abl" data-a="manheim"><img src="/logos/manheim.png" alt="Manheim" onload="this.parentNode.classList.add('hasimg')" onerror="lg(this)"><b>MANHEIM</b></span><span class="abl" data-a="copart"><img src="/logos/copart.png" alt="Copart" onload="this.parentNode.classList.add('hasimg')" onerror="lg(this)"><b>COPART</b></span><span class="abl" data-a="iaai"><img src="/logos/iaai.png" alt="IAAI" onload="this.parentNode.classList.add('hasimg')" onerror="lg(this)"><b>IAAI</b></span><span class="abl" data-a="adesa"><img src="/logos/adesa.png" alt="Adesa" onload="this.parentNode.classList.add('hasimg')" onerror="lg(this)"><b>ADESA</b></span></div>
 <div class="req" id="req"><h3 data-i="req_h">Request a service</h3>
 <div class="rsel"><label><input type="radio" name="svc" value="Car sourcing and buying"><span data-i="req_s1">Car sourcing and buying</span></label><label><input type="radio" name="svc" value="Auction pre-purchase inspection"><span data-i="req_s2">Auction pre-purchase inspection</span></label></div>
-<div class="row2"><label class="fld"><span data-i="q_name">Your name</span><input id="req_n" autocomplete="name"></label>
-<label class="fld"><span data-i="req_c">Phone or email</span><input id="req_c" autocomplete="tel email"></label></div>
+<div class="row3"><label class="fld"><span data-i="q_name">Your name</span><input id="req_n" autocomplete="name"></label><label class="fld"><span data-i="req_p">Phone</span><input id="req_p" type="tel" inputmode="tel" autocomplete="tel"></label><label class="fld"><span data-i="req_em">Email</span><input id="req_e" type="email" inputmode="email" autocomplete="email"></label></div>
+<p class="note hint" data-i="req_hint">Please fill in at least one: phone or email.</p>
 <label class="fld"><span data-i="req_ml">Briefly describe the car you are looking for. If you want, add a link to a specific car (optional)</span><textarea id="req_m" rows="4" data-ph="req_ph" placeholder="e.g. Ford F-150, 2021-2023, up to $35,000"></textarea></label>
 <button type="button" class="btn" id="req_s" data-i="q_send">Send request</button><p class="note" id="req_t" data-render=""></p></div>
 </div></section>
@@ -313,6 +325,7 @@ dialog#cf[open]{display:flex;flex-direction:column}
 
 <dialog id="lb" aria-label="Photo viewer"><button type="button" class="lbb lbx" id="lbx" aria-label="Close">×</button><button type="button" class="lbb lbp" id="lbp" aria-label="Previous photo">‹</button><div id="lbw" data-render=""></div><button type="button" class="lbb lbf" id="lbf" aria-label="Next photo">›</button><div id="lbc" data-render=""></div></dialog>
 <dialog id="cf" aria-label="CARFAX report"><div class="cfh"><strong id="cft">CARFAX</strong><button type="button" class="btn alt cfx" data-cfx data-i="close">Close</button></div><div class="cfb" id="cfb" data-render=""></div><div class="cff"><button type="button" class="btn alt cfx" data-cfx data-i="close">Close</button></div></dialog>
+<dialog id="ty" aria-label="Thank you"><div class="tyb"><div class="tyc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h2 data-i="ty_h">Thank you!</h2><p data-i="ty_t">We received your request and will contact you soon.</p></div></dialog>
 <footer><div class="wrap"><div class="social" data-render="" data-soc=""></div><p style="margin:0 0 8px">705 Live Oak St, Unit J, Tarpon Springs, FL 34689</p><span data-i="foot">© 2026 Carbase LLC. All rights reserved. Prices and availability subject to change.</span></div></footer>
 
 <script>
@@ -403,16 +416,17 @@ document.getElementById("dth").onclick=function(e){var b=e.target.closest("butto
 document.getElementById("dx").onclick=function(){dlg.close()};
 document.getElementById("ask").onclick=function(){
 var q=G("qf");
-q.innerHTML='<label class="fld">'+ts("q_name")+'<input id="q_n" autocomplete="name"></label><label class="fld">'+ts("req_c")+'<input id="q_e" autocomplete="tel email"></label><label class="fld">'+ts("q_msg")+'<textarea id="q_m" rows="3"></textarea></label><button type="button" class="btn" id="q_s">'+ts("q_send")+'</button><p class="note" id="q_t"></p>';
+q.innerHTML='<label class="fld">'+ts("q_name")+'<input id="q_n" autocomplete="name"></label><label class="fld">'+ts("req_p")+'<input id="q_p" type="tel" inputmode="tel" autocomplete="tel"></label><label class="fld">'+ts("req_em")+'<input id="q_e" type="email" inputmode="email" autocomplete="email"></label><p class="note hint">'+ts("req_hint")+'</p><label class="fld">'+ts("q_msg")+'<textarea id="q_m" rows="3"></textarea></label><button type="button" class="btn" id="q_s">'+ts("q_send")+'</button><p class="note" id="q_t"></p>';
 G("q_n").focus();
 G("q_s").onclick=function(){
-var n=cl(G("q_n").value),e=cl(G("q_e").value),m=cl(G("q_m").value),t=G("q_t");
-if(!n||!okc(e)){t.textContent=ts("q_err2");return}
+var n=cl(G("q_n").value),ph=cl(G("q_p").value),e=cl(G("q_e").value),m=cl(G("q_m").value),t=G("q_t");
+var pOk=!ph||ph.replace(/\D/g,"").length>=7,eOk=!e||/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);
+if(!n||(!ph&&!e)||!pOk||!eOk){t.textContent=ts("q_err3");return}
 var car=cur.y+" "+cur.b+" "+cur.m,sb=G("q_s");sb.disabled=true;
-var body=new URLSearchParams({"form-name":"inquiry",name:n,email:/@/.test(e)?e:"",contact:e,message:m,car:car}).toString();
+var body=new URLSearchParams({"form-name":"inquiry",name:n,phone:ph,email:e,contact:ph||e,message:m,car:car}).toString();
 var jobs=[fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:body}).then(function(r){if(!r.ok)throw 0})];
-var WK=cfg.wk||"3b16df44-40fd-4b16-ab01-58926dbea1cd";if(WK)jobs.push(fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({access_key:WK,subject:"Inquiry: "+car,from_name:"Carbase website",name:n,email:/@/.test(e)?e:undefined,contact:e,message:m,car:car})}).then(function(r){return r.json()}).then(function(j){if(!j.success)throw 0}));
-Promise.allSettled(jobs).then(function(rs){if(rs.some(function(x){return x.status==="fulfilled"}))t.textContent=ts("q_thanks");else{t.textContent=ts("q_fail");sb.disabled=false}})}};
+var WK=cfg.wk||"3b16df44-40fd-4b16-ab01-58926dbea1cd";if(WK)jobs.push(fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({access_key:WK,subject:"Inquiry: "+car,from_name:"Carbase website",name:n,phone:ph||undefined,email:e||undefined,message:m,car:car})}).then(function(r){return r.json()}).then(function(j){if(!j.success)throw 0}));
+Promise.allSettled(jobs).then(function(rs){if(rs.some(function(x){return x.status==="fulfilled"})){t.textContent="";showThanks()}else{t.textContent=ts("q_fail");sb.disabled=false}})}};
 dlg.addEventListener("click",function(e){if(e.target===dlg)dlg.close()});
 dlg.addEventListener("close",function(){if(last&&last.focus)last.focus()});
 function cl(x){return String(x==null?"":x).replace(/[<>"]/g,"").trim()}
@@ -548,13 +562,18 @@ ad("srv2_c","Photo and video report with our honest opinion","Фото- і ві�
 ad("req_h","Request a service","Залишити заявку","Оставить заявку");ad("req_s1","Car sourcing","Підбір авто","Подбор авто");ad("req_s2","Auction pre-purchase inspection","Огляд авто на аукціоні перед купівлею","Осмотр авто на аукционе перед покупкой");ad("req_c","Phone or email","Телефон або email","Телефон или email");
 ad("req_err","Please choose a service and enter your name and a phone or email.","Оберіть послугу та вкажіть ім'я і телефон або email.","Выберите услугу и укажите имя и телефон или email.");
 var ES3={"nav_srv":"Servicios","about4":"También trabajamos con las principales subastas de EE. UU., incluidas Manheim, Copart, IAAI y Adesa, y con otras plataformas.","auc_h":"Subastas con las que trabajamos","auc_more":"y otras","auc_note":"Todos los nombres y logotipos son marcas registradas de sus respectivos propietarios.","srv_h":"Servicios de subasta","srv_sub":"Le ayudamos a comprar un auto en subasta: desde encontrar el adecuado hasta una revisión cuidadosa antes de pujar.","srv1_t":"Búsqueda y compra en subastas de autos para dealers","srv1_d":"Muchos buenos autos se venden solo en plataformas de subasta cerradas, exclusivas para dealers, a las que el público general no tiene acceso. Díganos la marca, el modelo, el año y su presupuesto, y encontraremos el auto y lo compraremos para usted en la subasta.","srv1_a":"Búsqueda según su marca, modelo, año y presupuesto","srv1_b":"Una selección de las mejores opciones con fotos e informes de condición","srv1_c":"Consejo claro y una opinión honesta antes de decidir","srv2_t":"Inspección del vehículo en la subasta","srv2_d":"Las fotos y los informes de condición no siempre muestran todo. Antes de pujar, podemos revisar el auto en la subasta, cuando esta lo permite, y decirle lo que realmente vemos.","srv2_a":"Carrocería, pintura y señales de reparaciones previas","srv2_b":"Interior, llantas, luces y problemas mecánicos visibles","srv2_c":"Informe con fotos y video y nuestra opinión honesta","req_h":"Solicitar un servicio","req_s1":"Búsqueda de auto","req_s2":"Inspección previa a la compra en subasta","req_c":"Teléfono o correo electrónico","req_err":"Elija un servicio e ingrese su nombre y un teléfono o correo electrónico."};for(var k in ES3)D.es[k]=ES3[k];
-G("req_s").onclick=function(){var r=document.querySelector("#req input[name=svc]:checked"),n=cl(G("req_n").value),c=cl(G("req_c").value),m=cl(G("req_m").value),t=G("req_t"),sb=G("req_s");
-if(!r||!n||!okc(c)){t.textContent=ts("req_err");return}
+G("req_s").onclick=function(){var r=document.querySelector("#req input[name=svc]:checked"),n=cl(G("req_n").value),ph=cl(G("req_p").value),em=cl(G("req_e").value),m=cl(G("req_m").value),t=G("req_t"),sb=G("req_s");
+var pOk=!ph||ph.replace(/\D/g,"").length>=7,eOk=!em||/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em);
+if(!r||!n||(!ph&&!em)||!pOk||!eOk){t.textContent=ts("req_err2");return}
 sb.disabled=true;t.textContent="";var svc=r.value;
-var body=new URLSearchParams({"form-name":"service-request",service:svc,name:n,contact:c,message:m}).toString();
+var body=new URLSearchParams({"form-name":"service-request",service:svc,name:n,phone:ph,email:em,contact:ph||em,message:m}).toString();
 var jobs=[fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:body}).then(function(x){if(!x.ok)throw 0})];
-jobs.push(fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({access_key:wkey(),subject:"Service request: "+svc,from_name:"Carbase website",name:n,contact:c,message:m,service:svc})}).then(function(x){return x.json()}).then(function(j){if(!j.success)throw 0}));
-Promise.allSettled(jobs).then(function(rs){if(rs.some(function(x){return x.status==="fulfilled"})){t.textContent=ts("q_thanks");G("req_n").value="";G("req_c").value="";G("req_m").value="";r.checked=false}else{t.textContent=ts("q_fail")}sb.disabled=false})};
+jobs.push(fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({access_key:wkey(),subject:"Service request: "+svc,from_name:"Carbase website",name:n,phone:ph||undefined,email:em||undefined,message:m,service:svc})}).then(function(x){return x.json()}).then(function(j){if(!j.success)throw 0}));
+Promise.allSettled(jobs).then(function(rs){if(rs.some(function(x){return x.status==="fulfilled"})){t.textContent=ts("q_thanks");G("req_n").value="";G("req_p").value="";G("req_e").value="";G("req_m").value="";r.checked=false}else{t.textContent=ts("q_fail")}sb.disabled=false})};
+ad("req_p","Phone","Телефон","Телефон");ad("req_em","Email","Email","Email");
+ad("req_hint","Please fill in at least one: phone or email.","Заповніть хоча б одне: телефон або email.","Заполните хотя бы одно: телефон или email.");
+ad("req_err2","Please choose a service, enter your name and at least one valid contact: phone or email.","Оберіть послугу, вкажіть ім'я та хоча б один коректний контакт: телефон або email.","Выберите услугу, укажите имя и хотя бы один корректный контакт: телефон или email.");
+D.es["req_p"]="Teléfono";D.es["req_em"]="Correo electrónico";D.es["req_hint"]="Complete al menos uno: teléfono o correo electrónico.";D.es["req_err2"]="Elija un servicio, ingrese su nombre y al menos un contacto válido: teléfono o correo electrónico.";
 function okc(v){return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)||(!/@/.test(v)&&v.replace(/\D/g,"").length>=7)}
 ad("q_err2","Please enter your name and a valid phone number or email.","Вкажіть ім'я та коректний номер телефону або email.","Укажите имя и корректный номер телефона или email.");D.es["q_err2"]="Ingrese su nombre y un número de teléfono o correo electrónico válido.";
 ad("req_ml","Briefly describe the car you are looking for. If you want, add a link to a specific car (optional)","Коротко опишіть, яке авто ви шукаєте. За бажанням додайте посилання на конкретне авто (необов'язково)","Кратко опишите, какое авто вы ищете. При желании добавьте ссылку на конкретное авто (необязательно)");
@@ -562,6 +581,12 @@ ad("req_ph","e.g. Ford F-150, 2021-2023, up to $35,000","Наприклад: For
 D.es["req_ml"]="Describa brevemente el auto que busca. Si desea, agregue un enlace a un auto específico (opcional)";D.es["req_ph"]="Por ejemplo: Ford F-150, 2021-2023, hasta $35,000";
 ad("srv1_e","We bid and buy the car at the auction for you","Робимо ставки та купуємо авто на аукціоні для вас","Делаем ставки и покупаем авто на аукционе для вас");D.es["srv1_e"]="Pujamos y compramos el auto en la subasta por usted";
 ad("req_s1","Car sourcing and buying","Підбір і купівля авто","Подбор и покупка авто");D.es["req_s1"]="Búsqueda y compra de auto";
+ad("q_err3","Please enter your name and at least one valid contact: phone or email.","Вкажіть ім'я та хоча б один коректний контакт: телефон або email.","Укажите имя и хотя бы один корректный контакт: телефон или email.");D.es["q_err3"]="Ingrese su nombre y al menos un contacto válido: teléfono o correo electrónico.";
+var tyT=null;
+function closeThanks(){clearTimeout(tyT);var d=G("ty");if(d.open)d.close();if(G("dlg").open)G("dlg").close()}
+function showThanks(){var d=G("ty");if(!d.open)d.showModal();clearTimeout(tyT);tyT=setTimeout(closeThanks,3500)}
+G("ty").addEventListener("click",closeThanks);
+ad("ty_h","Thank you!","Дякуємо!","Спасибо!");ad("ty_t","We received your request and will contact you soon.","Ми отримали ваш запит і скоро зв'яжемося з вами.","Мы получили ваш запрос и скоро свяжемся с вами.");D.es["ty_h"]="¡Gracias!";D.es["ty_t"]="Recibimos su solicitud y nos pondremos en contacto pronto.";
 function applyLang(){
 document.documentElement.lang={en:"en",es:"es",ua:"uk",ru:"ru"}[L];
 document.querySelectorAll("[data-i]").forEach(function(e){e.textContent=ts(e.dataset.i)});
@@ -574,6 +599,6 @@ Promise.all([fetch("data/cars.json").then(function(r){return r.json()}),fetch("d
 </script>
 
 
-<form name="inquiry" data-netlify="true" netlify-honeypot="bot-field" hidden><input name="name"><input name="email"><input name="contact"><textarea name="message"></textarea><input name="car"><input name="bot-field"></form>
-<form name="service-request" data-netlify="true" netlify-honeypot="bot-field" hidden><input name="service"><input name="name"><input name="contact"><textarea name="message"></textarea><input name="bot-field"></form>
+<form name="inquiry" data-netlify="true" netlify-honeypot="bot-field" hidden><input name="name"><input name="phone"><input name="email"><input name="contact"><textarea name="message"></textarea><input name="car"><input name="bot-field"></form>
+<form name="service-request" data-netlify="true" netlify-honeypot="bot-field" hidden><input name="service"><input name="name"><input name="phone"><input name="email"><input name="contact"><textarea name="message"></textarea><input name="bot-field"></form>
 </body></html>
