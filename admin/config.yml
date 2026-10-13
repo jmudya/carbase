@@ -20,24 +20,33 @@ collections:
             label_singular: Car
             summary: "{{fields.y}} {{fields.b}} {{fields.m}}"
             fields:
-              - {label: Brand, name: b, widget: string}
+              # Required fields
+              - {label: Year, name: y, widget: number, value_type: int, min: 1990, max: 2035}
+              - {label: Make (brand), name: b, widget: string}
               - {label: Model, name: m, widget: string}
-              - {label: Year, name: y, widget: number, value_type: int}
-              - {label: Body type, name: t, widget: select, options: [Sedan, SUV, Truck, Coupe, EV]}
-              - {label: Mileage, name: mi, widget: number, value_type: int}
-              - {label: Price in USD, name: p, widget: number, value_type: int}
+              - label: VIN
+                name: vin
+                widget: string
+                pattern: ['^[A-HJ-NPR-Za-hj-npr-z0-9]{17}$', 'VIN must be exactly 17 characters (the letters I, O and Q are not used)']
+              - {label: Title, name: title, widget: select, options: [Clean, Rebuilt]}
+              # Optional fields
+              - {label: Body type, name: t, widget: select, options: [Sedan, SUV, Truck, Coupe, EV], required: false}
+              - {label: Mileage, name: mi, widget: number, value_type: int, required: false}
+              - {label: 'Price in USD (leave empty to show "Call for price")', name: p, widget: number, value_type: int, required: false}
               - {label: Sold, name: sold, widget: boolean, default: false, required: false}
-              - {label: Engine, name: e, widget: string, required: false}
-              - {label: VIN, name: vin, widget: string, required: false}
-              - {label: Horsepower, name: hp, widget: number, value_type: int, required: false}
               - {label: Fuel type, name: fuel, widget: select, options: [Gasoline, Diesel, Hybrid, Plug-in hybrid, Electric], required: false}
-              - {label: Title (shown next to the price), name: title, widget: select, options: [Clean, Rebuilt], required: false}
-              - {label: CARFAX report (PDF file), name: carfax, widget: file, required: false}
-              - {label: Window Sticker (PDF file, optional), name: wsticker, widget: file, required: false}
+              - {label: 'Battery capacity in kWh (only for Electric)', name: battery_kwh, widget: number, value_type: float, required: false}
+              - {label: 'Battery type (only for Electric)', name: battery_type, widget: select, options: [Lithium-ion, LFP, NMC, NCA, Other], required: false}
+              - {label: Engine, name: e, widget: string, required: false}
+              - {label: Horsepower, name: hp, widget: number, value_type: int, required: false}
+              - {label: Towing capacity (lbs), name: towing, widget: number, value_type: int, required: false}
               - {label: Transmission, name: tr, widget: string, required: false}
               - {label: Drivetrain, name: dr, widget: string, required: false}
               - {label: Exterior color, name: c, widget: string, required: false}
-              - {label: Video link (YouTube, TikTok, Facebook or Instagram), name: v, widget: string, required: false}
+              - {label: CARFAX report (PDF file), name: carfax, widget: file, required: false}
+              - {label: Window Sticker (PDF file, optional), name: wsticker, widget: file, required: false}
+              - {label: Video file (MP4, small file, up to about 25 MB), name: video, widget: file, required: false}
+              - {label: Video link (YouTube recommended; no file needed), name: v, widget: string, required: false}
               - label: Photos (up to 20, the first one is the cover)
                 name: imgs
                 widget: list
