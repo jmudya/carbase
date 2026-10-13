@@ -315,7 +315,7 @@ if(!n||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){t.textContent=ts("q_err");return}
 var car=cur.y+" "+cur.b+" "+cur.m,sb=G("q_s");sb.disabled=true;
 var body=new URLSearchParams({"form-name":"inquiry",name:n,email:e,message:m,car:car}).toString();
 var jobs=[fetch("/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:body}).then(function(r){if(!r.ok)throw 0})];
-if(cfg.wk)jobs.push(fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({access_key:cfg.wk,subject:"Inquiry: "+car,from_name:"CarBase website",name:n,email:e,message:m,car:car})}).then(function(r){return r.json()}).then(function(j){if(!j.success)throw 0}));
+var WK=cfg.wk||"3b16df44-40fd-4b16-ab01-58926dbea1cd";if(WK)jobs.push(fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({access_key:WK,subject:"Inquiry: "+car,from_name:"CarBase website",name:n,email:e,message:m,car:car})}).then(function(r){return r.json()}).then(function(j){if(!j.success)throw 0}));
 Promise.allSettled(jobs).then(function(rs){if(rs.some(function(x){return x.status==="fulfilled"}))t.textContent=ts("q_thanks");else{t.textContent=ts("q_fail");sb.disabled=false}})}};
 dlg.addEventListener("click",function(e){if(e.target===dlg)dlg.close()});
 dlg.addEventListener("close",function(){if(last&&last.focus)last.focus()});
