@@ -207,7 +207,7 @@ header .wrap.top{height:auto;max-width:1240px;padding-top:14px;padding-bottom:14
 <div class="dprice" id="dp" data-render=""></div>
 <div id="dvid" data-render=""></div>
 <dl id="dl" data-render=""></dl>
-<div class="row"><button type="button" class="btn" id="ask" data-i="ask">Ask about this car</button><span id="callw" data-render=""></span></div>
+<div class="row"><button type="button" class="btn" id="ask" data-i="ask">Ask about this car</button></div>
 <div id="qf" data-render=""></div>
 </div></dialog>
 
@@ -334,7 +334,6 @@ var i=[];
 phones().forEach(function(x){i.push('<a href="tel:'+x.d+'">'+x.t+'</a>')});
 if(cfg.em)i.push('<a href="mailto:'+cl(cfg.em)+'">'+cl(cfg.em)+'</a>');
 if(cfg.hr)i.push(cl(cfg.hr));
-G("callw").innerHTML=phones().map(function(x){return '<a class="btn alt" href="tel:'+x.d+'">'+ts("call")+' '+x.t+'</a>'}).join("");
 G("hcontact").innerHTML=(phones().length?'<div class="hl"><b>'+ts("sales")+'</b> '+phones().map(function(x){return '<a href="tel:'+x.d+'">'+x.t+'</a>'}).join('<i>|</i>')+'</div>':'')+(cfg.em?'<div class="hl"><b>'+ts("email")+'</b> <a href="mailto:'+cl(cfg.em)+'">'+cl(cfg.em)+'</a></div>':'');
 G("cinfo").innerHTML=i.map(function(x){return '<p class="ci">'+x+'</p>'}).join("")}
 function open2(i){EDIT?editCar(i):openCar(i)}
