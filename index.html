@@ -153,11 +153,9 @@ header .wrap.top{height:auto;max-width:1240px;padding-top:14px;padding-bottom:14
 .wrap.lb2{max-width:1240px;display:flex;justify-content:flex-end;gap:4px;padding-top:5px;padding-bottom:5px}
 .lb2 button{display:inline-flex;align-items:center;gap:6px;font:600 13px var(--body);color:var(--muted);background:none;border:1px solid transparent;border-radius:4px;padding:3px 10px;cursor:pointer}
 .lb2 button[aria-pressed=true]{color:#fff;background:var(--panel);border-color:var(--line)}
-#ask{flex:1 1 100%;width:100%;text-align:center;margin-left:0}
-#docs{flex-wrap:nowrap;margin-bottom:8px}
-#docs .btn{flex:1 1 0;min-width:0;width:auto;margin:0;text-align:center}
+#ask,#cfbtn{flex:1 1 100%;width:100%;text-align:center;margin-left:0}
 .dprice{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-.ttl{font:600 15px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ttl{font:600 13px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .ttl.rb{color:#ffb020}
 dialog#cf{width:100%;max-width:none;height:100%;max-height:none;margin:0;padding:0;border:0;border-radius:0;background:#0b0c0e;overflow:hidden}
 dialog#cf[open]{display:flex;flex-direction:column}
@@ -226,8 +224,7 @@ dialog#cf[open]{display:flex;flex-direction:column}
 <div class="dprice" id="dp" data-render=""></div>
 <div id="dvid" data-render=""></div>
 <dl id="dl" data-render=""></dl>
-<div class="row" id="docs" hidden><button type="button" class="btn alt" id="cfbtn" data-i="getcf" hidden>Get CARFAX</button><button type="button" class="btn alt" id="wsbtn" hidden>Window Sticker</button></div>
-<div class="row"><button type="button" class="btn" id="ask" data-i="ask">Ask about this car</button></div>
+<div class="row"><button type="button" class="btn" id="ask" data-i="ask">Ask about this car</button><button type="button" class="btn alt" id="cfbtn" data-i="getcf" hidden>Get CARFAX</button></div>
 <div id="qf" data-render=""></div>
 </div></dialog>
 
@@ -242,7 +239,7 @@ dialog#cf[open]{display:flex;flex-direction:column}
 <p class="note" id="stmsg" data-render=""></p></div></dialog>
 
 <dialog id="lb" aria-label="Photo viewer"><button type="button" class="lbb lbx" id="lbx" aria-label="Close">×</button><button type="button" class="lbb lbp" id="lbp" aria-label="Previous photo">‹</button><div id="lbw" data-render=""></div><button type="button" class="lbb lbf" id="lbf" aria-label="Next photo">›</button><div id="lbc" data-render=""></div></dialog>
-<dialog id="cf" aria-label="CARFAX report"><div class="cfh"><strong id="cft">CARFAX</strong><button type="button" class="btn alt cfx" data-cfx data-i="close">Close</button></div><div class="cfb" id="cfb" data-render=""></div><div class="cff"><button type="button" class="btn alt cfx" data-cfx data-i="close">Close</button></div></dialog>
+<dialog id="cf" aria-label="CARFAX report"><div class="cfh"><strong>CARFAX</strong><button type="button" class="btn alt cfx" data-cfx data-i="close">Close</button></div><div class="cfb" id="cfb" data-render=""></div><div class="cff"><button type="button" class="btn alt cfx" data-cfx data-i="close">Close</button></div></dialog>
 <footer><div class="wrap"><div class="social" data-render="" data-soc=""></div><p style="margin:0 0 8px">705 Live Oak St, Unit J, Tarpon Springs, FL 34689</p><span data-i="foot">© 2026 CarBase LLC. All rights reserved. Prices and availability subject to change.</span></div></footer>
 
 <script>
@@ -316,7 +313,7 @@ el.onclick=function(){sel=b;chipsDraw();draw()};chips.appendChild(el)})}
 function openCar(i){
 var c=cars[i];last=document.activeElement;
 document.getElementById("dt").textContent=c.y+" "+c.b+" "+c.m;
-cur=c;gal(c,0);G("qf").innerHTML="";G("ask").textContent=c.sold?ts("ask2"):ts("ask");G("cfbtn").hidden=!c.carfax;G("wsbtn").hidden=!c.wsticker;G("docs").hidden=!(c.carfax||c.wsticker);
+cur=c;gal(c,0);G("qf").innerHTML="";G("ask").textContent=c.sold?ts("ask2"):ts("ask");G("cfbtn").hidden=!c.carfax;
 document.getElementById("dvid").innerHTML=c.v?'<a class="btn alt" style="margin:0 0 14px" href="'+url(c.v)+'" target="_blank" rel="noopener">&#9654; '+ts("video")+'</a>':"";
 document.getElementById("dp").innerHTML="<span>$"+fmt(c.p)+"</span>"+(c.title?'<span class="ttl'+(c.title==="Rebuilt"?" rb":"")+'">'+ts("title")+": "+tg("ti",c.title)+"</span>":"");
 var rows=[[ts("r_y"),c.y],[ts("r_b"),c.b],[ts("r_m"),c.m],c.vin&&["VIN",c.vin],[ts("r_t"),tg("ty",c.t)],[ts("r_mi"),fmt(c.mi)+" "+ts("mi")],[ts("r_e"),c.e],c.hp&&[ts("r_hp"),fmt(+c.hp)+" hp"],c.fuel&&[ts("r_fu"),tg("fu",c.fuel)],[ts("r_tr"),tg("tr",c.tr)],[ts("r_dr"),c.dr],[ts("r_c"),tg("co",c.c)]].filter(Boolean);
@@ -441,12 +438,11 @@ ad("fu:Gasoline","Gasoline","Бензин","Бензин");ad("fu:Diesel","Diese
 var ES2={"getcf":"Obtener CARFAX","close":"Cerrar","loading":"Cargando...","openpdf":"Abrir el informe","title":"Título","r_hp":"Caballos de fuerza","r_fu":"Combustible","ti:Clean":"Limpio","ti:Rebuilt":"Reconstruido","fu:Gasoline":"Gasolina","fu:Diesel":"Diésel","fu:Hybrid":"Híbrido","fu:Plug-in hybrid":"Híbrido enchufable","fu:Electric":"Eléctrico"};for(var k in ES2)D.es[k]=ES2[k];
 var pdfP=null;
 function loadPdfjs(){return pdfP||(pdfP=new Promise(function(ok,no){var s=document.createElement("script");s.src="/vendor/pdf.min.js";s.onload=function(){pdfjsLib.GlobalWorkerOptions.workerSrc="/vendor/pdf.worker.min.js";ok()};s.onerror=no;document.head.appendChild(s)}))}
-function openCarfax(u,ttl){G("cft").textContent=ttl||"CARFAX";var b=G("cfb");b.innerHTML='<p class="cfm">'+ts("loading")+'</p>';G("cf").showModal();
+function openCarfax(u){var b=G("cfb");b.innerHTML='<p class="cfm">'+ts("loading")+'</p>';G("cf").showModal();
 loadPdfjs().then(function(){return pdfjsLib.getDocument(u).promise}).then(async function(pdf){b.innerHTML="";var r=window.devicePixelRatio||1,w=Math.min(b.clientWidth-24,900);
 for(var i=1;i<=pdf.numPages;i++){var pg=await pdf.getPage(i),v0=pg.getViewport({scale:1}),vp=pg.getViewport({scale:w/v0.width*r}),cv=document.createElement("canvas");cv.width=vp.width;cv.height=vp.height;cv.style.width=Math.round(vp.width/r)+"px";cv.className="cfp";b.appendChild(cv);await pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise}})
 .catch(function(){b.innerHTML='<p class="cfm"><a href="'+u+'" target="_blank" rel="noopener">'+ts("openpdf")+'</a></p>'})}
-G("cfbtn").onclick=function(){if(cur&&cur.carfax)openCarfax(cur.carfax,"CARFAX")};
-G("wsbtn").onclick=function(){if(cur&&cur.wsticker)openCarfax(cur.wsticker,"Window Sticker")};
+G("cfbtn").onclick=function(){if(cur&&cur.carfax)openCarfax(cur.carfax)};
 document.querySelectorAll("[data-cfx]").forEach(function(b){b.onclick=function(){G("cf").close()}});
 G("cf").addEventListener("close",function(){G("cfb").innerHTML=""});
 function applyLang(){
