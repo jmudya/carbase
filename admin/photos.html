@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Carbase: фото та картки авто</title>
+<style>
+:root{color-scheme:dark;--bg:#0f1114;--panel:#181b20;--line:#2a2f37;--text:#e8ecf0;--muted:#98a2ae;--red:#e23b2e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;padding:0 0 60px}
+.top{display:flex;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid var(--line);background:#000}
+.top a{color:var(--muted);text-decoration:none}.top h1{margin:0;font-size:20px}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px;margin:20px 0}
+h2{margin:0 0 14px;font-size:20px}
+label{display:block;margin-bottom:12px;color:var(--muted);font-size:14px}
+select,input[type=text]{display:block;width:100%;margin-top:4px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:11px 12px;font:inherit;font-size:16px}
+.chk{display:flex;gap:10px;align-items:center;color:var(--text);font-size:15px}.chk input{width:20px;height:20px;accent-color:var(--red)}
+.drop{display:block;border:2px dashed #3a414b;border-radius:8px;padding:26px;text-align:center;color:var(--text);cursor:pointer;margin:6px 0 14px}
+.drop input{display:none}.drop.over{border-color:var(--red)}
+.hint{color:var(--muted);font-size:14px;margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:14px}
+.ph{position:relative;aspect-ratio:4/3;border-radius:6px;overflow:hidden;border:3px solid transparent;cursor:pointer;background:#000}
+.ph img{width:100%;height:100%;object-fit:cover;display:block;opacity:.6}
+.ph.sel{border-color:var(--red)}.ph.sel img{opacity:1}
+.ph b{position:absolute;top:6px;left:6px;min-width:30px;height:30px;border-radius:15px;background:var(--red);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;padding:0 6px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.bar span{color:var(--muted);flex:1 1 160px}
+button{font:600 15px system-ui,sans-serif;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:11px 16px;cursor:pointer}
+button.primary{background:var(--red);border-color:var(--red);color:#fff}
+button:disabled{opacity:.5;cursor:default}
+.msg{margin:12px 0 0;min-height:22px}.ok{color:#3ddc84}.err{color:#ff8a80}
+.vrow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);color:var(--text);font-size:16px;margin:0}
+.vrow input{width:22px;height:22px;accent-color:var(--red);flex:none}
+.vrow small{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="top"><a href="/admin/">&larr; Адмінка</a><h1>Фото та картки авто</h1></div>
+<div class="wrap">
+<div class="box" id="auth" hidden><p id="authmsg"></p><p><a href="/admin/" style="color:var(--red)">Відкрити адмінку й увійти через GitHub</a>, потім повернутись на цю сторінку.</p></div>
+<div id="app" hidden>
+<div class="box">
+<h2>1. Додати багато фото до авто</h2>
+<label>Авто<select id="car"></select></label>
+<label class="chk"><input type="checkbox" id="replace"> Замінити всі наявні фото (інакше нові додадуться в кінець)</label>
+<label class="drop" id="drop"><input type="file" id="files" accept="image/*" multiple>Натисніть тут або перетягніть <b>усі фото одразу</b></label>
+<p class="hint">Спершу завантажте всі фото. Потім натискайте на фото <b>по черзі</b> в потрібному порядку: на кожному зʼявиться номер (1, 2, 3...). Фото з номером 1 стане обкладинкою. Фото без номера додані не будуть. Натисніть на фото з номером, щоб зняти його.</p>
+<div class="grid" id="grid"></div>
+<div class="bar"><span id="cnt"></span><button type="button" id="selAll">Вибрати всі по порядку</button><button type="button" id="clear">Скинути вибір</button><button type="button" class="primary" id="save">Зберегти фото</button></div>
+<p class="msg" id="msg"></p>
+</div>
+<div class="box">
+<h2>2. Показ авто на сайті та гарантія</h2>
+<p class="hint">Ліва галочка: показувати авто на сайті (зніміть, щоб тимчасово сховати, авто не видаляється). Галочка «Гарантія»: значок і умови гарантії для цього авто. Галочка «Як є»: значок AS-IS і повідомлення, що авто продається без гарантії (вимикає гарантію).</p>
+<div id="vis"></div>
+<div class="bar" style="margin-top:14px"><span></span><button type="button" class="primary" id="saveVis">Зберегти</button></div>
+<p class="msg" id="msg2"></p>
+</div>
+<p class="hint">Кожне збереження створює нову збірку сайту в Netlify. Якщо у Netlify увімкнено «Lock to stop auto publishing», кредити не витрачаються, а на живому сайті зміни зʼявляться після «Publish deploy».</p>
+</div>
+</div>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+var REPO="jmudya/carbase",BRANCH="main",TOKEN="",items=[],cars=[];
+function token(){var k=["decap-cms-user","netlify-cms-user"];for(var i=0;i<k.length;i++){try{var v=JSON.parse(localStorage.getItem(k[i])||"null");if(v&&v.token)return v.token}catch(e){}}return""}
+function gh(path,opt){opt=opt||{};opt.headers=Object.assign({Authorization:"token "+TOKEN,Accept:"application/vnd.github+json"},opt.headers||{});
+return fetch("https://api.github.com/repos/"+REPO+path,opt).then(function(r){return r.text().then(function(t){var j=null;try{j=JSON.parse(t)}catch(e){}if(!r.ok){var er=new Error((j&&j.message)||("HTTP "+r.status));er.status=r.status;throw er}return j})})}
+function utf8(b64){var bin=atob(b64.replace(/\s/g,"")),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new TextDecoder().decode(u)}
+function b64utf8(str){var u=new TextEncoder().encode(str),s="";for(var i=0;i<u.length;i++)s+=String.fromCharCode(u[i]);return btoa(s)}
+function loadCars(){return gh("/contents/data/cars.json?ref="+encodeURIComponent(BRANCH)).then(function(j){return{sha:j.sha,data:JSON.parse(utf8(j.content))}})}
+function label(c){return [c.y,c.b,c.m].filter(Boolean).join(" ")+(c.vin?" ("+String(c.vin).slice(-6)+")":"")}
+function same(a,b){return a&&b&&a.vin===b.vin&&a.y===b.y&&a.b===b.b&&a.m===b.m}
+function msg(id,t,cls){var e=$(id);e.textContent=t;e.className="msg"+(cls?" "+cls:"")}
+function fillCars(){
+$("car").innerHTML=cars.map(function(c,i){return '<option value="'+i+'">'+label(c).replace(/</g,"&lt;")+(c.hide?" (сховано)":"")+'</option>'}).join("");
+$("vis").innerHTML='<div class="vrow" style="color:var(--muted);font-size:13px"><span style="width:22px;flex:none">Показ.</span><span style="flex:1"></span><span style="width:70px;text-align:center">Гарантія</span><span style="width:60px;text-align:center">Як є</span></div>'+cars.map(function(c,i){return '<div class="vrow"><input type="checkbox" data-i="'+i+'"'+(c.hide?"":" checked")+'><span style="flex:1">'+label(c).replace(/</g,"&lt;")+' <small>'+(c.sold?"(продано)":"")+'</small></span><input type="checkbox" data-w="'+i+'"'+(c.warranty===true?" checked":"")+' title="Гарантія" style="margin:0 24px"><input type="checkbox" data-a="'+i+'"'+(c.asis===true?" checked":"")+' title="Продається як є, без гарантії" style="margin:0 18px"></div>'}).join("");$("vis").querySelectorAll("input[data-w],input[data-a]").forEach(function(x){x.onchange=function(){if(!x.checked)return;var k=x.dataset.w!=null?"a":"w",i=x.dataset.w!=null?x.dataset.w:x.dataset.a,o=$("vis").querySelector('input[data-'+k+'="'+i+'"]');if(o)o.checked=false}})}
+function init(){
+TOKEN=token();
+fetch("/admin/config.yml").then(function(r){return r.text()}).then(function(t){var a=t.match(/^\s*repo:\s*([^\s#]+)/m),b=t.match(/^\s*branch:\s*([^\s#]+)/m);if(a)REPO=a[1];if(b)BRANCH=b[1]}).catch(function(){}).then(function(){
+if(!TOKEN){$("auth").hidden=false;$("authmsg").textContent="Ви ще не увійшли в адмінку на цьому пристрої.";return}
+return loadCars().then(function(r){cars=r.data.cars||[];fillCars();$("app").hidden=false}).catch(function(e){$("auth").hidden=false;$("authmsg").textContent="Не вдалося прочитати список авто: "+e.message+". Можливо, потрібно увійти в адмінку знову."})})}
+// ---- photo handling
+function shrink(file){return new Promise(function(ok,no){var url=URL.createObjectURL(file),im=new Image();im.onload=function(){var M=1800,s=Math.min(1,M/Math.max(im.width,im.height)),w=Math.round(im.width*s),h=Math.round(im.height*s),c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);URL.revokeObjectURL(url);c.toBlob(function(b){b?ok(b):no()},"image/jpeg",0.82)};im.onerror=function(){URL.revokeObjectURL(url);no()};im.src=url})}
+function addFiles(list){var arr=Array.prototype.slice.call(list).filter(function(f){return/^image\//.test(f.type)||/\.(jpe?g|png|webp|heic)$/i.test(f.name)});if(!arr.length)return;msg("msg","Обробка фото...","");
+arr.reduce(function(p,f){return p.then(function(){return shrink(f).then(function(b){items.push({blob:b,url:URL.createObjectURL(b),name:f.name,n:0});draw()},function(){msg("msg","Не вдалося прочитати «"+f.name+"» (формат не підтримується браузером).","err")})})},Promise.resolve()).then(function(){if(!/err/.test($("msg").className))msg("msg","","")})}
+function sel(){return items.filter(function(x){return x.n>0}).length}
+function draw(){$("grid").innerHTML="";items.forEach(function(it,i){var d=document.createElement("div");d.className="ph"+(it.n?" sel":"");d.innerHTML='<img alt="" src="'+it.url+'">'+(it.n?"<b>"+it.n+"</b>":"");d.onclick=function(){toggle(i)};$("grid").appendChild(d)});
+$("cnt").textContent=items.length?("Вибрано "+sel()+" з "+items.length):""}
+function toggle(i){var it=items[i];if(it.n){var k=it.n;it.n=0;items.forEach(function(x){if(x.n>k)x.n--})}else{it.n=sel()+1}draw()}
+$("files").onchange=function(){addFiles(this.files);this.value=""};
+var dz=$("drop");["dragenter","dragover"].forEach(function(e){dz.addEventListener(e,function(ev){ev.preventDefault();dz.classList.add("over")})});["dragleave","drop"].forEach(function(e){dz.addEventListener(e,function(ev){ev.preventDefault();dz.classList.remove("over")})});dz.addEventListener("drop",function(ev){addFiles(ev.dataTransfer.files)});
+$("selAll").onclick=function(){items.forEach(function(x){if(!x.n)x.n=sel()+1});draw()};
+$("clear").onclick=function(){items.forEach(function(x){x.n=0});draw()};
+function toB64(blob){return new Promise(function(ok){var r=new FileReader();r.onload=function(){ok(String(r.result).split(",")[1])};r.readAsDataURL(blob)})}
+function slug(c){return String(c.vin||[c.y,c.b,c.m].join("-")).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"car"}
+function commitFiles(files,message){var parent,tree;
+return gh("/git/ref/heads/"+encodeURIComponent(BRANCH)).then(function(r){parent=r.object.sha;return gh("/git/commits/"+parent)}).then(function(c){tree=c.tree.sha;
+return files.reduce(function(p,f,i){return p.then(function(list){msg(f.msgId||"msg","Завантаження "+(i+1)+" з "+files.length+"...","");return gh("/git/blobs",{method:"POST",body:JSON.stringify({content:f.b64,encoding:"base64"})}).then(function(b){list.push({path:f.path,mode:"100644",type:"blob",sha:b.sha});return list})})},Promise.resolve([]))})
+.then(function(entries){return gh("/git/trees",{method:"POST",body:JSON.stringify({base_tree:tree,tree:entries})})}).then(function(t){return gh("/git/commits",{method:"POST",body:JSON.stringify({message:message,tree:t.sha,parents:[parent]})})}).then(function(c){return gh("/git/refs/heads/"+encodeURIComponent(BRANCH),{method:"PATCH",body:JSON.stringify({sha:c.sha})})})}
+$("save").onclick=function(){var chosen=items.filter(function(x){return x.n>0}).sort(function(a,b){return a.n-b.n}),idx=+$("car").value,car=cars[idx];
+if(!chosen.length){msg("msg","Спершу виберіть фото: натискайте на них по черзі.","err");return}
+$("save").disabled=true;msg("msg","Підготовка...","");
+loadCars().then(function(cur){var list=cur.data.cars||[],i=list.findIndex(function(c){return same(c,car)});if(i<0)throw new Error("Авто не знайдено у файлі. Оновіть сторінку.");
+var c=list[i],tag=Date.now().toString(36),paths=chosen.map(function(x,k){return"uploads/"+slug(c)+"-"+tag+"-"+(k+1)+".jpg"});
+return Promise.all(chosen.map(function(x){return toB64(x.blob)})).then(function(b64s){
+var old=c.imgs||(c.img?[c.img]:[]);c.imgs=($("replace").checked?[]:old).concat(paths.map(function(p){return"/"+p}));delete c.img;
+var files=paths.map(function(p,k){return{path:p,b64:b64s[k]}});files.push({path:"data/cars.json",b64:b64utf8(JSON.stringify(cur.data,null,1)+"\n")});
+return commitFiles(files,"Add "+chosen.length+" photos to "+label(c))})})
+.then(function(){msg("msg","Готово! Збережено фото: "+chosen.length+" (за один раз). Зміни зʼявляться на сайті після публікації в Netlify.","ok");items=[];draw();return loadCars().then(function(r){cars=r.data.cars||[];fillCars()})})
+.catch(function(e){msg("msg","Помилка: "+e.message+(e.status===409||/not a fast/i.test(e.message)?" (хтось змінив файли під час збереження, спробуйте ще раз)":""),"err")})
+.then(function(){$("save").disabled=false})};
+$("saveVis").onclick=function(){var want=[];$("vis").querySelectorAll("input[data-i]").forEach(function(b){var w=$("vis").querySelector('input[data-w="'+b.dataset.i+'"]'),a=$("vis").querySelector('input[data-a="'+b.dataset.i+'"]');want.push({i:+b.dataset.i,show:b.checked,war:!!(w&&w.checked),asis:!!(a&&a.checked),car:cars[+b.dataset.i]})});
+$("saveVis").disabled=true;msg("msg2","Збереження...","");
+loadCars().then(function(cur){var list=cur.data.cars||[];want.forEach(function(w){var c=list.find(function(x){return same(x,w.car)});if(c){if(w.show)delete c.hide;else c.hide=true;if(w.asis){c.asis=true;delete c.warranty}else{delete c.asis;if(w.war)c.warranty=true;else delete c.warranty}}});
+return gh("/contents/data/cars.json",{method:"PUT",body:JSON.stringify({message:"Show or hide cars, warranty switch",content:b64utf8(JSON.stringify(cur.data,null,1)+"\n"),sha:cur.sha,branch:BRANCH})})})
+.then(function(){msg("msg2","Збережено. Зміни зʼявляться на сайті після публікації в Netlify.","ok");return loadCars().then(function(r){cars=r.data.cars||[];fillCars()})})
+.catch(function(e){msg("msg2","Помилка: "+e.message,"err")}).then(function(){$("saveVis").disabled=false})};
+init();
+})();
+</script>
+</body>
+</html>

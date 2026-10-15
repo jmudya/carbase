@@ -34,6 +34,9 @@ collections:
               - {label: Mileage, name: mi, widget: number, value_type: int, required: false}
               - {label: 'Price in USD (leave empty to show "Call for price")', name: p, widget: number, value_type: int, required: false}
               - {label: Sold, name: sold, widget: boolean, default: false, required: false}
+              - {label: 'Hide this car on the website (temporarily)', name: hide, widget: boolean, default: false, required: false}
+              - {label: 'Show the 1 month warranty badge and warranty terms on this car (off by default)', name: warranty, widget: boolean, default: false, required: false}
+              - {label: 'Sold as-is, no warranty (shows an AS-IS badge and notice; overrides the warranty switch)', name: asis, widget: boolean, default: false, required: false}
               - {label: Fuel type, name: fuel, widget: select, options: [Gasoline, Diesel, Hybrid, Plug-in hybrid, Electric], required: false}
               - {label: 'Battery capacity in kWh (only for Electric)', name: battery_kwh, widget: number, value_type: float, required: false}
               - {label: 'Battery type (only for Electric)', name: battery_type, widget: select, options: [Lithium-ion, LFP, NMC, NCA, Other], required: false}
@@ -47,7 +50,7 @@ collections:
               - {label: Window Sticker (PDF file, optional), name: wsticker, widget: file, required: false}
               - {label: Video file (MP4, small file, up to about 25 MB), name: video, widget: file, required: false}
               - {label: Video link (YouTube recommended; no file needed), name: v, widget: string, required: false}
-              - label: Photos (up to 20, the first one is the cover)
+              - label: 'Photos (up to 20, the first one is the cover). For many photos use the red button at the bottom right of this page'
                 name: imgs
                 widget: list
                 required: false
@@ -65,8 +68,81 @@ collections:
           - {label: TikTok link, name: tt, widget: string, required: false}
           - {label: YouTube link, name: yt, widget: string, required: false}
           - {label: "Form email access key (from web3forms.com)", name: wk, widget: string, required: false}
+          - {label: 'Google review link (your Google Business Profile review link, optional)', name: gr, widget: string, required: false}
           - label: "Google Analytics ID (looks like G-XXXXXXXXXX)"
             name: ga
             widget: string
             required: false
             pattern: ['^G-[A-Za-z0-9]+$', 'Format: G- followed by letters and digits, for example G-AB12CD34EF']
+      - name: reviews
+        label: Customer reviews
+        file: data/reviews.json
+        fields:
+          - label: Reviews
+            name: reviews
+            widget: list
+            label_singular: Review
+            summary: "{{fields.name}}, {{fields.rating}} stars"
+            fields:
+              - {label: Customer name, name: name, widget: string}
+              - {label: 'City, State (optional)', name: loc, widget: string, required: false}
+              - {label: Rating (stars), name: rating, widget: select, options: ['5', '4', '3', '2', '1'], default: '5'}
+              - {label: Review text, name: text, widget: text}
+              - {label: 'Date (optional, for example March 2026)', name: date, widget: string, required: false}
+              - {label: 'Car bought (optional)', name: car, widget: string, required: false}
+              - {label: Photo (optional), name: photo, widget: image, required: false}
+              - {label: Video link (YouTube, optional), name: video, widget: string, required: false}
+      - name: calc
+        label: Prices and calculators
+        file: data/calc.json
+        fields:
+          - label: Warranty terms (shown only on cars where the warranty switch is on)
+            name: warranty
+            widget: object
+            fields:
+              - {label: 'Warranty length in days (30 = 1 month, 365 = 1 year)', name: days, widget: number, value_type: int, required: false}
+              - {label: 'Deductible per repair claim in USD (leave empty if none)', name: deductible, widget: number, value_type: float, required: false}
+          - label: Delivery within the USA
+            name: ship
+            widget: object
+            summary: 'Fill in all rates to turn on the price estimate'
+            fields:
+              - {label: 'Pickup ZIP code (your lot)', name: from_zip, widget: string, required: false}
+              - {label: 'Minimum price in USD', name: min, widget: number, value_type: float, required: false}
+              - {label: 'Rate in USD per mile: trips up to 250 miles', name: t1, widget: number, value_type: float, required: false}
+              - {label: 'Rate in USD per mile: 251 to 500 miles', name: t2, widget: number, value_type: float, required: false}
+              - {label: 'Rate in USD per mile: 501 to 1000 miles', name: t3, widget: number, value_type: float, required: false}
+              - {label: 'Rate in USD per mile: 1001 to 2000 miles', name: t4, widget: number, value_type: float, required: false}
+              - {label: 'Rate in USD per mile: over 2000 miles', name: t5, widget: number, value_type: float, required: false}
+              - {label: 'Enclosed trailer multiplier (for example 1.5)', name: enclosed, widget: number, value_type: float, required: false}
+              - {label: 'Extra for a car that does not run, USD', name: inop, widget: number, value_type: float, required: false}
+              - {label: 'Extra for SUV, pickup or van, USD', name: large, widget: number, value_type: float, required: false}
+          - label: Delivery to Ukraine
+            name: intl
+            widget: object
+            summary: 'Fill in the business numbers to turn on the calculator'
+            fields:
+              - {label: 'Our service fee, USD', name: service_fee, widget: number, value_type: float, required: false}
+              - {label: 'Delivery within the USA to the port, USD (average)', name: inland, widget: number, value_type: float, required: false}
+              - {label: 'Ocean freight, USD: sedan', name: ocean_sedan, widget: number, value_type: float, required: false}
+              - {label: 'Ocean freight, USD: crossover', name: ocean_crossover, widget: number, value_type: float, required: false}
+              - {label: 'Ocean freight, USD: SUV or pickup', name: ocean_suv, widget: number, value_type: float, required: false}
+              - {label: 'Forwarding, USD', name: forwarding, widget: number, value_type: float, required: false}
+              - {label: 'Truck from the destination port, USD', name: port_truck, widget: number, value_type: float, required: false}
+              - {label: 'Customs broker, USD', name: broker, widget: number, value_type: float, required: false}
+              - {label: 'Euro rate in USD (for excise, for example 1.10)', name: eur_usd, widget: number, value_type: float, required: false}
+              - {label: 'Insurance, % of the car price (default 2)', name: insurance_pct, widget: number, value_type: float, required: false}
+              - {label: 'Copart fee, % of the car price', name: copart_pct, widget: number, value_type: float, required: false}
+              - {label: 'Copart fee, fixed USD', name: copart_flat, widget: number, value_type: float, required: false}
+              - {label: 'IAAI fee, % of the car price', name: iaai_pct, widget: number, value_type: float, required: false}
+              - {label: 'IAAI fee, fixed USD', name: iaai_flat, widget: number, value_type: float, required: false}
+              - {label: 'Manheim fee, % of the car price', name: manheim_pct, widget: number, value_type: float, required: false}
+              - {label: 'Manheim fee, fixed USD', name: manheim_flat, widget: number, value_type: float, required: false}
+              - {label: 'Import duty, % (default 10)', name: duty_pct, widget: number, value_type: float, required: false}
+              - {label: 'VAT, % (default 20)', name: vat_pct, widget: number, value_type: float, required: false}
+              - {label: 'Excise EUR per 1000 cm3 per year: petrol up to 3000 cm3 (default 50)', name: ex_petrol_lo, widget: number, value_type: float, required: false}
+              - {label: 'Excise: petrol over 3000 cm3 (default 100)', name: ex_petrol_hi, widget: number, value_type: float, required: false}
+              - {label: 'Excise: diesel up to 3500 cm3 (default 75)', name: ex_diesel_lo, widget: number, value_type: float, required: false}
+              - {label: 'Excise: diesel over 3500 cm3 (default 150)', name: ex_diesel_hi, widget: number, value_type: float, required: false}
+              - {label: 'Excise: hybrid, fixed EUR per car (default 100)', name: ex_hybrid, widget: number, value_type: float, required: false}
+              - {label: 'Excise: electric, EUR per kWh of battery (default 1)', name: ex_ev_kwh, widget: number, value_type: float, required: false}

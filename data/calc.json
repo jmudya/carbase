@@ -1,0 +1,49 @@
+{
+ "carfax": {
+  "price": "",
+  "pay": ""
+ },
+ "ship": {
+  "from_zip": "34689",
+  "min": "",
+  "t1": "",
+  "t2": "",
+  "t3": "",
+  "t4": "",
+  "t5": "",
+  "enclosed": "",
+  "inop": "",
+  "large": ""
+ },
+ "intl": {
+  "service_fee": "",
+  "inland": "",
+  "ocean_sedan": "",
+  "ocean_crossover": "",
+  "ocean_suv": "",
+  "ocean_moto": "",
+  "forwarding": "",
+  "port_truck": "",
+  "broker": "",
+  "eur_usd": "",
+  "insurance_pct": 2,
+  "copart_pct": "",
+  "copart_flat": "",
+  "iaai_pct": "",
+  "iaai_flat": "",
+  "manheim_pct": "",
+  "manheim_flat": "",
+  "duty_pct": 10,
+  "vat_pct": 20,
+  "ex_petrol_lo": 50,
+  "ex_petrol_hi": 100,
+  "ex_diesel_lo": 75,
+  "ex_diesel_hi": 150,
+  "ex_hybrid": 100,
+  "ex_ev_kwh": 1
+ },
+ "warranty": {
+  "days": 30,
+  "deductible": ""
+ }
+}
