@@ -173,7 +173,8 @@ dialog#cf[open]{display:flex;flex-direction:column}
 .cfx{margin:0;padding:10px 22px}
 .cfb{flex:1;overflow:auto;padding:12px;text-align:center}
 .cfp{display:block;margin:0 auto 12px;background:#fff;max-width:100%}
-.cfm{color:var(--muted);padding:40px 0}.cfm a{color:#fff}
+.cfm{color:var(--muted);padding:40px 0}
+.cfi{display:block;margin:0 auto 12px;max-width:min(100%,1000px);height:auto;background:#fff;border-radius:4px}.cfm a{color:#fff}
 .vbar{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:0 0 10px;padding:6px 10px;border:1px solid var(--line);border-radius:4px;background:transparent;color:var(--text);font:700 13px var(--body);letter-spacing:.14em;cursor:pointer}
 .vbar:hover{background:#20242a}
 .vbar svg{width:14px;height:14px;flex:none}
@@ -588,6 +589,7 @@ var ES2={"getcf":"Obtener CARFAX","close":"Cerrar","loading":"Cargando...","open
 var pdfP=null;
 function loadPdfjs(){return pdfP||(pdfP=new Promise(function(ok,no){var s=document.createElement("script");s.src="/vendor/pdf.min.js";s.onload=function(){pdfjsLib.GlobalWorkerOptions.workerSrc="/vendor/pdf.worker.min.js";ok()};s.onerror=no;document.head.appendChild(s)}))}
 function openCarfax(u,ttl){G("cft").textContent=ttl||"CARFAX";var b=G("cfb");b.innerHTML='<p class="cfm">'+ts("loading")+'</p>';G("cf").showModal();
+if(/\.(jpe?g|png|webp|gif)(\?|#|$)/i.test(u)){b.innerHTML='<img class="cfi" src="'+im(u,2000)+'" data-o="'+u+'" onerror="fb(this)" alt="">';return}
 loadPdfjs().then(function(){return pdfjsLib.getDocument(u).promise}).then(async function(pdf){b.innerHTML="";var r=window.devicePixelRatio||1,w=Math.min(b.clientWidth-24,900);
 for(var i=1;i<=pdf.numPages;i++){var pg=await pdf.getPage(i),v0=pg.getViewport({scale:1}),vp=pg.getViewport({scale:w/v0.width*r}),cv=document.createElement("canvas");cv.width=vp.width;cv.height=vp.height;cv.style.width=Math.round(vp.width/r)+"px";cv.className="cfp";b.appendChild(cv);await pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise}})
 .catch(function(){b.innerHTML='<p class="cfm"><a href="'+u+'" target="_blank" rel="noopener">'+ts("openpdf")+'</a></p>'})}
