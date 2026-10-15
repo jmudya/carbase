@@ -65,3 +65,8 @@ collections:
           - {label: TikTok link, name: tt, widget: string, required: false}
           - {label: YouTube link, name: yt, widget: string, required: false}
           - {label: "Form email access key (from web3forms.com)", name: wk, widget: string, required: false}
+          - label: "Google Analytics ID (looks like G-XXXXXXXXXX)"
+            name: ga
+            widget: string
+            required: false
+            pattern: ['^G-[A-Za-z0-9]+$', 'Format: G- followed by letters and digits, for example G-AB12CD34EF']
