@@ -109,6 +109,27 @@
       "warranty": false,
       "mi": 19000,
       "tr": "Single-speed"
+    },
+    {
+      "b": "Honda",
+      "hide": false,
+      "c": "Grey",
+      "e": "2.0L I4 Hybrid (Atkinson cycle) + electric motor",
+      "hp": 195,
+      "carfax": "/uploads/honda-1hgcr6f54ea006038.pdf",
+      "m": "Accord Hybrid EX-L",
+      "dr": "FWD",
+      "p": 7000,
+      "t": "Sedan",
+      "sold": false,
+      "fuel": "Hybrid",
+      "title": "Clean",
+      "y": 2014,
+      "vin": "1HGCR6F54EA006038",
+      "asis": false,
+      "warranty": false,
+      "mi": 131223,
+      "tr": "e-CVT"
     }
   ]
 }
