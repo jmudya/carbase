@@ -81,10 +81,14 @@
       "b": "Tesla ",
       "hide": false,
       "c": "Grey",
-      "battery_kwh": 290,
+      "e": "Dual motor, electric",
+      "hp": 0,
+      "battery_kwh": 82,
+      "battery_type": "NCA",
       "m": "Model 3 Long Range Sedan 4D",
+      "dr": "AWD",
       "p": 18500,
-      "t": "Sedan",
+      "t": "EV",
       "sold": false,
       "fuel": "Electric",
       "title": "Clean",
@@ -92,7 +96,8 @@
       "vin": "5YJ3E1EB5MF975115",
       "asis": false,
       "warranty": false,
-      "mi": 19000
+      "mi": 19000,
+      "tr": "Single-speed"
     }
   ]
 }
