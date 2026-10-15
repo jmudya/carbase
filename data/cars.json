@@ -241,6 +241,23 @@
       "warranty": false,
       "mi": 77523,
       "tr": "Transmission: 1-speed fixed gear"
+    },
+    {
+      "b": "Tesla",
+      "hide": false,
+      "c": "White",
+      "e": "Electric Vehicle",
+      "m": "Model Y Long Range Single Motor ",
+      "dr": "RWD",
+      "p": 16090,
+      "sold": false,
+      "fuel": "Electric",
+      "title": "Rebuilt",
+      "y": 2024,
+      "vin": "7SAYGDED2RF047890",
+      "asis": false,
+      "warranty": false,
+      "mi": 13226
     }
   ]
 }
