@@ -133,7 +133,7 @@
         "/uploads/1hgcr6f54ea006038-mv8xwuls-10.jpg"
       ],
       "t": "Sedan",
-      "sold": false,
+      "sold": true,
       "fuel": "Hybrid",
       "title": "Clean",
       "y": 2014,
