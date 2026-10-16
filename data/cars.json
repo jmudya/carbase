@@ -88,7 +88,7 @@
       "battery_type": "NCA",
       "m": "Model 3 Long Range Sedan 4D",
       "dr": "AWD",
-      "p": 18500,
+      "p": 19000,
       "imgs": [
         "/uploads/5yj3e1eb5mf975115-mv8xjfyp-1.jpg",
         "/uploads/5yj3e1eb5mf975115-mv8xjfyp-2.jpg",
@@ -107,7 +107,7 @@
       "vin": "5YJ3E1EB5MF975115",
       "asis": false,
       "warranty": false,
-      "mi": 19000,
+      "mi": 68500,
       "tr": "Single-speed"
     },
     {
