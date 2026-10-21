@@ -34,6 +34,7 @@ collections:
               - {label: Mileage, name: mi, widget: number, value_type: int, required: false}
               - {label: 'Price in USD (leave empty to show "Call for price")', name: p, widget: number, value_type: int, required: false}
               - {label: Sold, name: sold, widget: boolean, default: false, required: false}
+              - {label: 'Sale pending (a client is considering this car: shows a PENDING badge, switch it off when the deal is decided)', name: pending, widget: boolean, default: false, required: false}
               - {label: 'Hide this car on the website (temporarily)', name: hide, widget: boolean, default: false, required: false}
               - {label: 'Show the 1 month warranty badge and warranty terms on this car (off by default)', name: warranty, widget: boolean, default: false, required: false}
               - {label: 'Sold as-is, no warranty (shows an AS-IS badge and notice; overrides the warranty switch)', name: asis, widget: boolean, default: false, required: false}
@@ -68,6 +69,7 @@ collections:
           - {label: TikTok link, name: tt, widget: string, required: false}
           - {label: YouTube link, name: yt, widget: string, required: false}
           - {label: "Form email access key (from web3forms.com)", name: wk, widget: string, required: false}
+          - {label: 'Google reviews widget code (paste the embed code from Elfsight, Trustindex, Featurable or a similar service, optional)', name: rv_embed, widget: text, required: false}
           - {label: 'Google review link (your Google Business Profile review link, optional)', name: gr, widget: string, required: false}
           - label: "Google Analytics ID (looks like G-XXXXXXXXXX)"
             name: ga
