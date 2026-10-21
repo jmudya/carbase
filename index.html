@@ -300,6 +300,21 @@ dialog#dlg{width:min(840px,calc(100% - 48px))}
 #dlg .fld{font-size:17px}
 #dlg .fld input,#dlg .fld select,#dlg .fld textarea{font-size:19px;padding:13px 15px}
 }
+.navscroll{position:relative;display:flex;flex:1 1 auto;min-width:0}
+.navscroll::before,.navscroll::after{content:"";position:absolute;top:0;bottom:0;width:52px;pointer-events:none;opacity:0;transition:opacity .2s;z-index:2}
+.navscroll::before{left:0;background:linear-gradient(to right,#1b1f25 30%,rgba(27,31,37,0))}
+.navscroll::after{right:0;background:linear-gradient(to left,#1b1f25 30%,rgba(27,31,37,0))}
+.navscroll.can-l::before,.navscroll.can-r::after{opacity:1}
+.navarr{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:28px;height:28px;border-radius:50%;border:1px solid #3a414b;background:#2a2f37;color:#fff;display:none;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.navarr svg{width:16px;height:16px}
+.nl-l{left:3px}.nl-r{right:3px}
+.navscroll.can-l .nl-l,.navscroll.can-r .nl-r{display:flex}
+@keyframes navnudge{0%,100%{transform:translateY(-50%) translateX(0)}50%{transform:translateY(-50%) translateX(5px)}}
+.navscroll.hint .nl-r{animation:navnudge 1.1s ease-in-out 4}
+.totop{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:40;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(27,31,37,.94);color:var(--text);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.45)}
+.totop[hidden]{display:none}
+.totop svg{width:20px;height:20px}
+.totop:hover{background:#2a2f37}
 .cbn{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:60;max-width:640px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:#1b1f25;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.5);font-size:15px}
 .cbb{display:flex;gap:8px}
 .cbb .btn{margin:0;padding:9px 16px;font-size:15px}
@@ -346,7 +361,7 @@ dialog#dlg{width:min(840px,calc(100% - 48px))}
 <div class="hinfo"><a class="haddr" href="https://www.google.com/maps/search/?api=1&amp;query=705+Live+Oak+St+Unit+J+Tarpon+Springs+FL+34689" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"></path></svg><span>705 Live Oak St, Unit J<br>Tarpon Springs, FL 34689</span></a>
 <div class="hcon" id="hcontact" data-render=""></div>
 <div class="social hsoc" data-render="" data-soc=""></div></div></div></header>
-<nav class="navbar" aria-label="Main"><div class="wrap"><div class="navlinks"><a href="#top" data-i="nav_home">Home</a><a href="#inventory" data-i="nav_inv">Inventory</a><a href="#about" data-i="nav_about">About us</a><a href="#services" data-i="nav_srv">Services</a><a href="#buy" data-i="nav_buy">We buy cars</a><a href="#delivery" data-i="nav_dl">Delivery</a><a href="#reviews" id="nav_rv" data-i="nav_rv" hidden>Reviews</a><a class="cta" href="#contact" data-i="nav_contact">Contact us</a></div><div class="nl lang" id="lang"><button type="button" class="lgb" id="lgb" aria-haspopup="listbox" aria-expanded="false" aria-label="Language"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.500 2.600 3.800 5.600 3.800 9S14.500 18.400 12 21c-2.500-2.600-3.800-5.600-3.800-9S9.500 5.600 12 3z"/></svg><span id="lgc">EN</span><svg class="chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><ul class="lb2 lgm" id="lgm" role="listbox" hidden><li><button type="button" data-l="en">English</button></li><li><button type="button" data-l="es">Español</button></li><li><button type="button" data-l="ua">Українська</button></li><li><button type="button" data-l="ru">Русский</button></li></ul></div></div></nav>
+<nav class="navbar" aria-label="Main"><div class="wrap"><div class="navscroll hint" id="navscroll"><button type="button" class="navarr nl-l" id="navL" aria-label="Scroll menu left" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><div class="navlinks" id="navlinks"><a href="#top" data-i="nav_home">Home</a><a href="#inventory" data-i="nav_inv">Inventory</a><a href="#about" data-i="nav_about">About us</a><a href="#services" data-i="nav_srv">Services</a><a href="#buy" data-i="nav_buy">We buy cars</a><a href="#delivery" data-i="nav_dl">Delivery</a><a href="#reviews" id="nav_rv" data-i="nav_rv" hidden>Reviews</a><a class="cta" href="#contact" data-i="nav_contact">Contact us</a></div><button type="button" class="navarr nl-r" id="navR" aria-label="Scroll menu right" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="nl lang" id="lang"><button type="button" class="lgb" id="lgb" aria-haspopup="listbox" aria-expanded="false" aria-label="Language"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.500 2.600 3.800 5.600 3.800 9S14.500 18.400 12 21c-2.500-2.600-3.800-5.600-3.800-9S9.500 5.600 12 3z"/></svg><span id="lgc">EN</span><svg class="chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><ul class="lb2 lgm" id="lgm" role="listbox" hidden><li><button type="button" data-l="en">English</button></li><li><button type="button" data-l="es">Español</button></li><li><button type="button" data-l="ua">Українська</button></li><li><button type="button" data-l="ru">Русский</button></li></ul></div></div></nav>
 
 <main id="top">
 <div class="hero"><div class="wrap">
@@ -440,6 +455,7 @@ dialog#dlg{width:min(840px,calc(100% - 48px))}
 <dialog id="lb" aria-label="Photo viewer"><button type="button" class="lbb lbx" id="lbx" aria-label="Close">×</button><button type="button" class="lbb lbp" id="lbp" aria-label="Previous photo">‹</button><div id="lbw" data-render=""></div><button type="button" class="lbb lbf" id="lbf" aria-label="Next photo">›</button><div id="lbc" data-render=""></div></dialog>
 <dialog id="cf" aria-label="CARFAX report"><div class="cfh"><strong id="cft">CARFAX</strong><button type="button" class="btn alt cfx" data-cfx data-i="close">Close</button></div><div class="cfb" id="cfb" data-render=""></div><div class="cff"><button type="button" class="btn alt cfx" data-cfx data-i="close">Close</button></div></dialog>
 <dialog id="ty" aria-label="Thank you"><div class="tyb"><div class="tyc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h2 data-i="ty_h">Thank you!</h2><p data-i="ty_t">We received your request and will contact you soon.</p></div></dialog>
+<button type="button" class="totop" id="totop" aria-label="Back to top" title="Back to top" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>
 <div id="cb" class="cbn" hidden><span data-i="cb_t">We use cookies to count visits and improve the site.</span><div class="cbb"><button type="button" class="btn" id="cb_y" data-i="cb_a">Accept</button><button type="button" class="btn alt" id="cb_n" data-i="cb_d">Decline</button></div></div>
 <footer><div class="wrap"><div class="social" data-render="" data-soc=""></div><p style="margin:0 0 8px">705 Live Oak St, Unit J, Tarpon Springs, FL 34689</p><span data-i="foot">© 2026 Carbase LLC. All rights reserved. Prices and availability subject to change.</span></div></footer>
 
@@ -992,13 +1008,23 @@ ad("by_c5d","Tell us where the car is and we will discuss how to pick it up.","�
 ad("bc_body","Body or suspension damage","Пошкодження кузова чи ходової","Повреждения кузова или ходовой");
 ad("desc_h","Description","Опис","Описание");
 var ES10={"by_sub": "Compramos Ford F-150, Tesla y otros vehículos, funcionen o no: con daños de carrocería o suspensión por una colisión, problemas de motor o transmisión, o batería dañada. Envíenos los datos y le haremos una oferta.", "by_c1t": "Ford F-150, Tesla y otras marcas", "by_c1d": "Pickups, vehículos eléctricos, autos y SUV de otras marcas.", "by_c2t": "Daños de carrocería y suspensión", "by_c2d": "Daños por colisión en la carrocería, el chasis, la suspensión o la dirección. Bolsas de aire desplegadas, pérdida total, título salvage o rebuilt.", "by_c3t": "Motor, transmisión y más", "by_c3d": "Motor con golpeteo, sin compresión, transmisión que patina o averiada, sobrecalentamiento, fallas eléctricas.", "by_c4t": "Batería dañada o muerta", "by_c4d": "Vehículos eléctricos e híbridos con la batería de alto voltaje dañada o desgastada.", "by_c5t": "No funciona", "by_c5d": "Díganos dónde está el auto y hablaremos de cómo recogerlo.", "bc_body": "Daños de carrocería o suspensión", "desc_h": "Descripción"};for(var k in ES10)D.es[k]=ES10[k];
+ad("totop","Back to top","Нагору","Наверх","Volver arriba");D.es["totop"]="Volver arriba";
+function navUpd(){var el=G("navlinks"),w=G("navscroll");if(!el||!w)return;var max=el.scrollWidth-el.clientWidth;w.classList.toggle("can-l",el.scrollLeft>4);w.classList.toggle("can-r",el.scrollLeft<max-4)}
+G("navlinks").addEventListener("scroll",function(){navUpd();G("navscroll").classList.remove("hint")},{passive:true});
+window.addEventListener("resize",navUpd);
+G("navL").onclick=function(){G("navlinks").scrollBy({left:-170,behavior:"smooth"})};
+G("navR").onclick=function(){G("navlinks").scrollBy({left:170,behavior:"smooth"})};
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(navUpd);
+(function(){var tp=G("totop"),busy=false;function t(){busy=false;tp.hidden=window.scrollY<600}
+window.addEventListener("scroll",function(){if(!busy){busy=true;requestAnimationFrame(t)}},{passive:true});
+tp.onclick=function(){window.scrollTo({top:0,behavior:"smooth"})}})();
 function applyLang(){
 document.documentElement.lang={en:"en",es:"es",ua:"uk",ru:"ru"}[L];
 var _y1=G("fd_y1").value,_y2=G("fd_y2").value;fillYears();G("fd_y1").value=_y1;G("fd_y2").value=_y2;
 document.querySelectorAll("[data-i]").forEach(function(e){e.textContent=ts(e.dataset.i)});
 document.querySelectorAll(".lb2 button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.l===L)});G("lgc").textContent=L.toUpperCase();
 document.querySelectorAll("[data-ph]").forEach(function(e){e.placeholder=ts(e.dataset.ph)});
-chipsDraw();draw();renderCfg();renderReviews();usEst();inCalc()}
+chipsDraw();draw();renderCfg();renderReviews();usEst();inCalc();navUpd();G("totop").setAttribute("aria-label",ts("totop"));G("totop").title=ts("totop")}
 document.querySelectorAll(".lb2 button").forEach(function(b){b.onclick=function(){L=b.dataset.l;track("change_language",{lang:L});try{localStorage.setItem("cblang",L)}catch(e){}applyLang()}});
 applyLang();
 Promise.all([fetch("data/cars.json").then(function(r){return r.json()}),fetch("data/settings.json").then(function(r){return r.json()}),jf("data/calc.json"),jf("data/reviews.json")]).then(function(r){cars=(r[0].cars||[]).filter(function(c){return !c.hide}).sort(function(a,b){function r(c){return c.sold?2:(c.pending?1:0)}return r(a)-r(b)});cfg=r[1]||{};CALC=r[2]||{};RV=(r[3]&&r[3].reviews)||[]}).catch(function(){}).then(function(){var y=new Date().getFullYear(),o="";for(var i=y+1;i>=y-30;i--)o+="<option"+(i===y-8?" selected":"")+">"+i+"</option>";G("in_year").innerHTML=o;if(!G("us_from").value)G("us_from").value=String((CALC.ship&&CALC.ship.from_zip)||"34689");applyLang();initAdmin();initGA();bindInputs();openFromUrl()});
