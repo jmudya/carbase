@@ -25,7 +25,8 @@ exports.handler = async (event) => {
   const price = Number(c.p) > 0 ? "$" + Number(c.p).toLocaleString("en-US") : "Call for price";
   const title = name + " | " + price + " | Carbase LLC";
   const bits = [c.t, Number(c.mi) > 0 ? Number(c.mi).toLocaleString("en-US") + " mi" : "", c.title ? "Title: " + c.title : "", c.fuel, c.sold ? "SOLD" : (c.pending ? "SALE PENDING" : "")].filter(Boolean);
-  const desc = (bits.join(" · ") + " · Tarpon Springs, FL · Carbase LLC").replace(/^ · /, "");
+  const own = String(c.desc || "").replace(/\s+/g, " ").trim().slice(0, 180);
+  const desc = own || (bits.join(" · ") + " · Tarpon Springs, FL · Carbase LLC").replace(/^ · /, "");
   const first = (c.imgs && c.imgs[0]) || c.img || "";
   const image = first
     ? (/^https?:/.test(first) ? first : origin + "/.netlify/images?url=" + encodeURIComponent(first) + "&w=1200&h=630&fit=cover")

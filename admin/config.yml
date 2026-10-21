@@ -47,6 +47,7 @@ collections:
               - {label: Transmission, name: tr, widget: string, required: false}
               - {label: Drivetrain, name: dr, widget: string, required: false}
               - {label: Exterior color, name: c, widget: string, required: false}
+              - {label: 'Description (optional, shown on the car page; you can write several lines)', name: desc, widget: text, required: false}
               - {label: CARFAX report (PDF file or photo), name: carfax, widget: file, required: false}
               - {label: Window Sticker (PDF file or photo, optional), name: wsticker, widget: file, required: false}
               - {label: Video file (MP4, small file, up to about 25 MB), name: video, widget: file, required: false}
