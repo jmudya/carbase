@@ -687,15 +687,17 @@ function loadPdfjs(){return pdfP||(pdfP=new Promise(function(ok,no){var s=docume
 var _cfUrl="";
 function sniff(h){var t="";for(var i=0;i<Math.min(h.length,1024);i++)t+=String.fromCharCode(h[i]);if(t.indexOf("%PDF-")>-1)return"pdf";
 if(h[0]===255&&h[1]===216)return"image/jpeg";if(h[0]===137&&t.slice(1,4)==="PNG")return"image/png";if(t.slice(0,3)==="GIF")return"image/gif";if(t.slice(0,4)==="RIFF"&&t.slice(8,12)==="WEBP")return"image/webp";return""}
-function cfNote(b,u,key){b.innerHTML='<p class="cfm">'+ts(key)+'</p><p class="cfm"><a href="'+u+'" target="_blank" rel="noopener">'+ts("open_new")+'</a></p>'}
+function cfNote(b,u,key,why){b.innerHTML='<p class="cfm">'+ts(key)+'</p>'+(why?'<p class="cfm" style="font-size:13px;opacity:.7;margin-top:-18px">('+String(why).replace(/[<>&]/g,"")+')</p>':"")+'<p class="cfm"><a href="'+u+'" target="_blank" rel="noopener">'+ts("open_new")+'</a></p>'}
 function openCarfax(u,ttl){G("cft").textContent=ttl||"CARFAX";var b=G("cfb");b.innerHTML='<p class="cfm">'+ts("loading")+'</p>';G("cf").showModal();
 if(_cfUrl){try{URL.revokeObjectURL(_cfUrl)}catch(e){}_cfUrl=""}
-fetch(u,{cache:"no-store"}).then(function(r){if(!r.ok)throw 0;return r.arrayBuffer()}).then(function(buf){var kind=sniff(new Uint8Array(buf.slice(0,1100)));
-if(kind.indexOf("image/")===0){_cfUrl=URL.createObjectURL(new Blob([buf],{type:kind}));b.innerHTML='<img class="cfi" src="'+_cfUrl+'" alt="">';return}
+var ct="";
+fetch(u,{cache:"no-store"}).then(function(r){if(!r.ok)throw"HTTP "+r.status;ct=(r.headers.get("content-type")||"").split(";")[0].trim().toLowerCase();return r.arrayBuffer()}).then(function(buf){var kind=sniff(new Uint8Array(buf.slice(0,1100)));
+if(!kind&&/^image\/(?!svg)/.test(ct))kind=ct;if(!kind&&/pdf/.test(ct))kind="pdf";
+if(kind.indexOf("image/")===0){_cfUrl=URL.createObjectURL(new Blob([buf],{type:kind}));b.innerHTML='<img class="cfi" src="'+_cfUrl+'" alt="" onerror="this.outerHTML=\'<p class=cfm>'+ts("doc_na")+'</p>\'">';return}
 if(kind==="pdf"){return loadPdfjs().then(function(){return pdfjsLib.getDocument({data:new Uint8Array(buf.slice(0))}).promise}).then(async function(pdf){b.innerHTML="";var r=window.devicePixelRatio||1,w=Math.min(b.clientWidth-24,900);
 for(var i=1;i<=pdf.numPages;i++){var pg=await pdf.getPage(i),v0=pg.getViewport({scale:1}),vp=pg.getViewport({scale:w/v0.width*r}),cv=document.createElement("canvas");cv.width=vp.width;cv.height=vp.height;cv.style.width=Math.round(vp.width/r)+"px";cv.className="cfp";b.appendChild(cv);await pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise}})
 .catch(function(){_cfUrl=URL.createObjectURL(new Blob([buf],{type:"application/pdf"}));b.innerHTML='<iframe class="cfif" src="'+_cfUrl+'" title="PDF"></iframe><p class="cfm"><a href="'+_cfUrl+'" target="_blank" rel="noopener">'+ts("open_new")+'</a></p>'})}
-cfNote(b,u,"doc_na")}).catch(function(){cfNote(b,u,"doc_na")})}
+cfNote(b,u,"doc_na","file type: "+(ct||"unknown"))}).catch(function(e){cfNote(b,u,"doc_na",typeof e==="string"?e:"could not load")})}
 G("cfbtn").onclick=function(){if(cur&&cur.carfax){track("open_carfax",{car_name:cur.y+" "+cur.b+" "+cur.m});openCarfax(cur.carfax,"CARFAX")}};
 G("wsbtn").onclick=function(){if(cur&&cur.wsticker){track("open_window_sticker",{car_name:cur.y+" "+cur.b+" "+cur.m});openCarfax(cur.wsticker,"Window Sticker")}};
 document.querySelectorAll("[data-cfx]").forEach(function(b){b.onclick=function(){G("cf").close()}});
