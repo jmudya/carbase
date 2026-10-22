@@ -174,6 +174,7 @@ dialog#cf[open]{display:flex;flex-direction:column}
 .cfb{flex:1;overflow:auto;padding:12px;text-align:center}
 .cfp{display:block;margin:0 auto 12px;background:#fff;max-width:100%}
 .cfm{color:var(--muted);padding:40px 0}
+.cfif{display:block;width:100%;height:min(78vh,900px);border:0;background:#fff;border-radius:4px}
 .cfi{display:block;margin:0 auto 12px;max-width:min(100%,1000px);height:auto;background:#fff;border-radius:4px}.cfm a{color:#fff}
 .vbar{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:0 0 10px;padding:6px 10px;border:1px solid var(--line);border-radius:4px;background:transparent;color:var(--text);font:700 13px var(--body);letter-spacing:.14em;cursor:pointer}
 .vbar:hover{background:#20242a}
@@ -683,11 +684,18 @@ ad("fu:Gasoline","Gasoline","Бензин","Бензин");ad("fu:Diesel","Diese
 var ES2={"getcf":"Obtener CARFAX","close":"Cerrar","loading":"Cargando...","openpdf":"Abrir el informe","title":"Título","r_hp":"Caballos de fuerza","r_fu":"Combustible","ti:Clean":"Limpio","ti:Rebuilt":"Reconstruido","fu:Gasoline":"Gasolina","fu:Diesel":"Diésel","fu:Hybrid":"Híbrido","fu:Plug-in hybrid":"Híbrido enchufable","fu:Electric":"Eléctrico"};for(var k in ES2)D.es[k]=ES2[k];
 var pdfP=null;
 function loadPdfjs(){return pdfP||(pdfP=new Promise(function(ok,no){var s=document.createElement("script");s.src="/vendor/pdf.min.js";s.onload=function(){pdfjsLib.GlobalWorkerOptions.workerSrc="/vendor/pdf.worker.min.js";ok()};s.onerror=no;document.head.appendChild(s)}))}
+var _cfUrl="";
+function sniff(h){var t="";for(var i=0;i<Math.min(h.length,1024);i++)t+=String.fromCharCode(h[i]);if(t.indexOf("%PDF-")>-1)return"pdf";
+if(h[0]===255&&h[1]===216)return"image/jpeg";if(h[0]===137&&t.slice(1,4)==="PNG")return"image/png";if(t.slice(0,3)==="GIF")return"image/gif";if(t.slice(0,4)==="RIFF"&&t.slice(8,12)==="WEBP")return"image/webp";return""}
+function cfNote(b,u,key){b.innerHTML='<p class="cfm">'+ts(key)+'</p><p class="cfm"><a href="'+u+'" target="_blank" rel="noopener">'+ts("open_new")+'</a></p>'}
 function openCarfax(u,ttl){G("cft").textContent=ttl||"CARFAX";var b=G("cfb");b.innerHTML='<p class="cfm">'+ts("loading")+'</p>';G("cf").showModal();
-if(/\.(jpe?g|png|webp|gif)(\?|#|$)/i.test(u)){b.innerHTML='<img class="cfi" src="'+im(u,2000)+'" data-o="'+u+'" onerror="fb(this)" alt="">';return}
-loadPdfjs().then(function(){return pdfjsLib.getDocument(u).promise}).then(async function(pdf){b.innerHTML="";var r=window.devicePixelRatio||1,w=Math.min(b.clientWidth-24,900);
+if(_cfUrl){try{URL.revokeObjectURL(_cfUrl)}catch(e){}_cfUrl=""}
+fetch(u,{cache:"no-store"}).then(function(r){if(!r.ok)throw 0;return r.arrayBuffer()}).then(function(buf){var kind=sniff(new Uint8Array(buf.slice(0,1100)));
+if(kind.indexOf("image/")===0){_cfUrl=URL.createObjectURL(new Blob([buf],{type:kind}));b.innerHTML='<img class="cfi" src="'+_cfUrl+'" alt="">';return}
+if(kind==="pdf"){return loadPdfjs().then(function(){return pdfjsLib.getDocument({data:new Uint8Array(buf.slice(0))}).promise}).then(async function(pdf){b.innerHTML="";var r=window.devicePixelRatio||1,w=Math.min(b.clientWidth-24,900);
 for(var i=1;i<=pdf.numPages;i++){var pg=await pdf.getPage(i),v0=pg.getViewport({scale:1}),vp=pg.getViewport({scale:w/v0.width*r}),cv=document.createElement("canvas");cv.width=vp.width;cv.height=vp.height;cv.style.width=Math.round(vp.width/r)+"px";cv.className="cfp";b.appendChild(cv);await pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise}})
-.catch(function(){b.innerHTML='<p class="cfm"><a href="'+u+'" target="_blank" rel="noopener">'+ts("openpdf")+'</a></p>'})}
+.catch(function(){_cfUrl=URL.createObjectURL(new Blob([buf],{type:"application/pdf"}));b.innerHTML='<iframe class="cfif" src="'+_cfUrl+'" title="PDF"></iframe><p class="cfm"><a href="'+_cfUrl+'" target="_blank" rel="noopener">'+ts("open_new")+'</a></p>'})}
+cfNote(b,u,"doc_na")}).catch(function(){cfNote(b,u,"doc_na")})}
 G("cfbtn").onclick=function(){if(cur&&cur.carfax){track("open_carfax",{car_name:cur.y+" "+cur.b+" "+cur.m});openCarfax(cur.carfax,"CARFAX")}};
 G("wsbtn").onclick=function(){if(cur&&cur.wsticker){track("open_window_sticker",{car_name:cur.y+" "+cur.b+" "+cur.m});openCarfax(cur.wsticker,"Window Sticker")}};
 document.querySelectorAll("[data-cfx]").forEach(function(b){b.onclick=function(){G("cf").close()}});
@@ -1066,6 +1074,9 @@ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeT
 G("shm").showModal();try{document.activeElement&&document.activeElement.blur()}catch(e){}}
 G("shm_x").onclick=function(){G("shm").close()};
 G("shm").addEventListener("click",function(e){if(e.target===G("shm"))G("shm").close()});
+ad("doc_na","This document cannot be shown here right now.","Цей документ зараз неможливо показати тут.","Этот документ сейчас невозможно показать здесь.");
+ad("open_new","Open in a new tab","Відкрити в новій вкладці","Открыть в новой вкладке");
+var ES12={"doc_na": "Este documento no se puede mostrar aquí ahora.", "open_new": "Abrir en una pestaña nueva"};for(var k in ES12)D.es[k]=ES12[k];
 function applyLang(){
 document.documentElement.lang={en:"en",es:"es",ua:"uk",ru:"ru"}[L];
 var _y1=G("fd_y1").value,_y2=G("fd_y2").value;fillYears();G("fd_y1").value=_y1;G("fd_y2").value=_y2;
