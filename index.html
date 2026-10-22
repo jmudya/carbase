@@ -315,6 +315,27 @@ dialog#dlg{width:min(840px,calc(100% - 48px))}
 .totop[hidden]{display:none}
 .totop svg{width:20px;height:20px}
 .totop:hover{background:#2a2f37}
+dialog#shm{width:min(560px,calc(100% - 28px));padding:0;border:1px solid #444;border-radius:22px;background:#2b2b2b;color:#f3f3f3;overflow:auto}
+dialog#shm::backdrop{background:rgba(0,0,0,.68)}
+.shmb{padding:26px;animation:typop .25s ease-out}
+.shmh{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.shmh h3{margin:0;font:700 24px var(--body);letter-spacing:0;text-transform:none}
+.shmx{background:none;border:0;color:#cfcfcf;font-size:30px;line-height:1;cursor:pointer;padding:2px 8px;border-radius:8px}
+.shmx:hover{background:#3a3a3a;color:#fff}
+.shmp{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#111}
+.shmp img{width:100%;height:100%;object-fit:cover;display:block}
+.shmc{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin:12px 2px 4px}
+.shmc b{font:700 18px var(--body)}.shmc span{font:800 20px var(--body);color:#fff;white-space:nowrap}
+.shmi{display:flex;gap:12px;align-items:flex-start;margin:16px 2px 24px;color:#d8d8d8}
+.shmi svg{width:22px;height:22px;flex:none;margin-top:2px}
+.shmi b{display:block;font:700 16px var(--body)}.shmi p{margin:2px 0 0;color:#bdbdbd;font-size:15px;line-height:1.45}
+.shma{display:grid;grid-template-columns:repeat(7,1fr);gap:8px 4px;margin-top:6px}
+.sb{display:flex;flex-direction:column;align-items:center;gap:9px;background:none;border:0;color:#f3f3f3;text-decoration:none;font:500 14px var(--body);cursor:pointer;padding:0}
+.sb .ic{width:56px;height:56px;border-radius:50%;background:#3a3a3a;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .15s}
+.sb .ic svg{width:26px;height:26px}
+.sb:hover .ic{background:#4a4a4a;transform:translateY(-2px)}
+.sb .sl{text-align:center;line-height:1.2}
+@media(max-width:520px){.shma{grid-template-columns:repeat(4,1fr);gap:18px 4px}}
 .cbn{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:60;max-width:640px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:#1b1f25;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.5);font-size:15px}
 .cbb{display:flex;gap:8px}
 .cbb .btn{margin:0;padding:9px 16px;font-size:15px}
@@ -454,6 +475,7 @@ dialog#dlg{width:min(840px,calc(100% - 48px))}
 
 <dialog id="lb" aria-label="Photo viewer"><button type="button" class="lbb lbx" id="lbx" aria-label="Close">×</button><button type="button" class="lbb lbp" id="lbp" aria-label="Previous photo">‹</button><div id="lbw" data-render=""></div><button type="button" class="lbb lbf" id="lbf" aria-label="Next photo">›</button><div id="lbc" data-render=""></div></dialog>
 <dialog id="cf" aria-label="CARFAX report"><div class="cfh"><strong id="cft">CARFAX</strong><button type="button" class="btn alt cfx" data-cfx data-i="close">Close</button></div><div class="cfb" id="cfb" data-render=""></div><div class="cff"><button type="button" class="btn alt cfx" data-cfx data-i="close">Close</button></div></dialog>
+<dialog id="shm" aria-labelledby="shm_t"><div class="shmb"><div class="shmh"><h3 id="shm_t" data-i="share_t">Share this car</h3><button type="button" class="shmx" id="shm_x" aria-label="Close">&times;</button></div><div class="shmp" id="shm_p"></div><div class="shmc"><b id="shm_n"></b><span id="shm_pr"></span></div><div class="shmi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg><div><b data-i="share_i1">Share a public link to this car</b><p data-i="share_i2">Anyone with the link can view this car on carbaseusa.com.</p></div></div><div class="shma"><button class="sb" data-act="copy" id="sb_copy" type="button"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span><span class="sl" data-i="copy_l">Copy link</span></button><a class="sb" data-act="wa" id="sb_wa" target="_blank" rel="noopener noreferrer"><span class="ic"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm5.77 14.1c-.24.68-1.42 1.3-1.95 1.38-.5.07-1.13.1-1.82-.11-.42-.13-.96-.31-1.65-.6-2.9-1.25-4.8-4.17-4.94-4.37-.14-.19-1.18-1.57-1.18-3 0-1.43.75-2.13 1.01-2.42.27-.29.58-.36.78-.36l.56.01c.18.01.42-.07.66.5.24.59.83 2.03.9 2.18.07.15.12.32.02.51-.1.19-.15.31-.29.48-.15.17-.31.38-.44.51-.15.15-.3.31-.13.6.17.29.76 1.25 1.63 2.03 1.12 1 2.06 1.31 2.35 1.46.29.14.46.12.63-.07.17-.19.73-.85.93-1.14.19-.29.39-.24.66-.14.27.1 1.7.8 1.99.95.29.14.49.22.56.34.07.12.07.7-.17 1.38z"/></svg></span><span class="sl" data-i="sh_wa">WhatsApp</span></a><a class="sb" data-act="tg" id="sb_tg" target="_blank" rel="noopener noreferrer"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></span><span class="sl" data-i="sh_tg">Telegram</span></a><a class="sb" data-act="fb" id="sb_fb" target="_blank" rel="noopener noreferrer"><span class="ic"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 8V6.5c0-.7.3-1 1-1h2V2h-3c-3 0-4.5 1.8-4.5 4.5V8H7v3.5h2.5V22H14V11.5h2.8L17.3 8H14z"/></svg></span><span class="sl" data-i="sh_fb">Facebook</span></a><button type="button" class="sb" data-act="ig" id="sb_ig"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/></svg></span><span class="sl" data-i="sh_ig">Instagram</span></button><a class="sb" data-act="x" id="sb_x" target="_blank" rel="noopener noreferrer"><span class="ic"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span><span class="sl" data-i="sh_x">X</span></a><a class="sb" data-act="mail" id="sb_mail" target="_blank" rel="noopener noreferrer"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span><span class="sl" data-i="sh_mail">Email</span></a></div></div></dialog>
 <dialog id="ty" aria-label="Thank you"><div class="tyb"><div class="tyc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h2 data-i="ty_h">Thank you!</h2><p data-i="ty_t">We received your request and will contact you soon.</p></div></dialog>
 <button type="button" class="totop" id="totop" aria-label="Back to top" title="Back to top" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>
 <div id="cb" class="cbn" hidden><span data-i="cb_t">We use cookies to count visits and improve the site.</span><div class="cbb"><button type="button" class="btn" id="cb_y" data-i="cb_a">Accept</button><button type="button" class="btn alt" id="cb_n" data-i="cb_d">Decline</button></div></div>
@@ -989,8 +1011,7 @@ function shareUrl(c){return location.origin+"/car/"+carSlug(c)+"/"}
 var _tt=null;function toast(t){var e=G("toast");e.textContent=t;e.hidden=false;clearTimeout(_tt);_tt=setTimeout(function(){e.hidden=true},2200)}
 function shareCar(){var c=cur;if(!c)return;var u=shareUrl(c),t=c.y+" "+c.b+" "+c.m+(+c.p>0?" - $"+fmt(c.p):"");track("share",{car_name:c.y+" "+c.b+" "+c.m});
 if(navigator.share&&window.matchMedia&&matchMedia("(pointer:coarse)").matches){navigator.share({title:t,text:t+" | Carbase LLC",url:u}).catch(function(){});return}
-function fallback(){try{window.prompt("",u)}catch(e){}}
-if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(function(){toast(ts("copied"))},fallback);else fallback()}
+openShare(c)}
 function openFromUrl(){var v="";try{v=(new URLSearchParams(location.search).get("car")||"")||((location.hash.match(/car=([A-Za-z0-9]+)/)||[])[1]||"")}catch(e){}
 v=String(v).toLowerCase().replace(/[^a-z0-9]/g,"");if(v.length!==17)return;var i=cars.findIndex(function(c){return String(c.vin||"").toLowerCase()===v});if(i>=0)openCar(i)}
 ad("pending","Sale pending","В розгляді","В рассмотрении");D.es["pending"]="Venta pendiente";
@@ -1018,6 +1039,33 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(navUpd);
 (function(){var tp=G("totop"),busy=false;function t(){busy=false;tp.hidden=window.scrollY<600}
 window.addEventListener("scroll",function(){if(!busy){busy=true;requestAnimationFrame(t)}},{passive:true});
 tp.onclick=function(){window.scrollTo({top:0,behavior:"smooth"})}})();
+ad("share_t","Share this car","Поділитись авто","Поделиться авто");
+ad("share_i1","Share a public link to this car","Поділитись публічним посиланням на це авто","Поделиться публичной ссылкой на это авто");
+ad("share_i2","Anyone with the link can view this car on carbaseusa.com.","Усі, хто має це посилання, можуть переглянути це авто на carbaseusa.com.","Все, у кого есть эта ссылка, могут посмотреть это авто на carbaseusa.com.");
+ad("copy_l","Copy link","Копіювати посилання","Копировать ссылку");
+ad("copied2","Copied!","Скопійовано!","Скопировано!");
+ad("sh_ig","Instagram","Instagram","Instagram");D.es["sh_ig"]="Instagram";
+ad("sh_wa","WhatsApp","WhatsApp","WhatsApp");
+ad("sh_tg","Telegram","Telegram","Telegram");
+ad("sh_fb","Facebook","Facebook","Facebook");
+ad("sh_x","X","X","X");
+ad("sh_mail","Email","Пошта","Почта");
+var ES11={"share_t": "Compartir este auto", "share_i1": "Compartir un enlace público de este auto", "share_i2": "Cualquiera con el enlace puede ver este auto en carbaseusa.com.", "copy_l": "Copiar enlace", "copied2": "¡Copiado!", "sh_wa": "WhatsApp", "sh_tg": "Telegram", "sh_fb": "Facebook", "sh_x": "X", "sh_mail": "Correo"};for(var k in ES11)D.es[k]=ES11[k];
+function openShare(c){var u=shareUrl(c),n=c.y+" "+c.b+" "+c.m,pr=+c.p>0?"$"+fmt(c.p):"",t=n+(pr?" - "+pr:""),ph=(c.imgs&&c.imgs[0])||c.img||"";
+G("shm_p").innerHTML=ph?'<img src="'+im(ph,900)+'" data-o="'+ph+'" onerror="fb(this)" alt="">':art(c);G("shm_n").textContent=n;G("shm_pr").textContent=pr;
+var eu=encodeURIComponent(u),et=encodeURIComponent(t+" | Carbase LLC");
+G("sb_wa").href="https://wa.me/?text="+et+"%20"+eu;G("sb_tg").href="https://t.me/share/url?url="+eu+"&text="+et;G("sb_fb").href="https://www.facebook.com/sharer/sharer.php?u="+eu;
+G("sb_x").href="https://twitter.com/intent/tweet?url="+eu+"&text="+et;G("sb_mail").href="mailto:?subject="+encodeURIComponent(t)+"&body="+encodeURIComponent(t+"\n"+u);
+var cl2=G("sb_copy").querySelector(".sl");cl2.textContent=ts("copy_l");cl2.dataset.i="copy_l";
+G("sb_copy").onclick=function(){function ok(){cl2.textContent=ts("copied2");setTimeout(function(){cl2.textContent=ts("copy_l")},2000);track("share",{method:"copy"})}
+if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(ok,function(){try{window.prompt("",u)}catch(e){}});else{try{window.prompt("",u)}catch(e){}}};
+G("sb_ig").onclick=function(){var l=G("sb_ig").querySelector(".sl");track("share",{method:"instagram"});
+function go(){l.textContent=ts("copied2");setTimeout(function(){l.textContent=ts("sh_ig")},2400);window.open("https://www.instagram.com/direct/new/","_blank","noopener,noreferrer")}
+if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(go,function(){try{window.prompt("",u)}catch(e){}go()});else{try{window.prompt("",u)}catch(e){}go()}};
+["sb_wa","sb_tg","sb_fb","sb_x","sb_mail"].forEach(function(i){G(i).onclick=function(){track("share",{method:i.slice(3)})}});
+G("shm").showModal();try{document.activeElement&&document.activeElement.blur()}catch(e){}}
+G("shm_x").onclick=function(){G("shm").close()};
+G("shm").addEventListener("click",function(e){if(e.target===G("shm"))G("shm").close()});
 function applyLang(){
 document.documentElement.lang={en:"en",es:"es",ua:"uk",ru:"ru"}[L];
 var _y1=G("fd_y1").value,_y2=G("fd_y2").value;fillYears();G("fd_y1").value=_y1;G("fd_y2").value=_y2;
