@@ -5,7 +5,7 @@
       "c": "Skyblue",
       "e": "5.0L V8 F DOHC 32V",
       "wsticker": "/uploads/789926008_3449228908571310_391715658009705711_n.jpg",
-      "towing": 13,
+      "towing": 13000,
       "hp": 400,
       "carfax": "/uploads/ford-f150-2023-1ftew1c55pkd73809.pdf",
       "m": "F-150 XLT Pickup 4D 5 1/2 ft",
@@ -286,6 +286,32 @@
       "asis": false,
       "warranty": false,
       "mi": 13227
+    },
+    {
+      "b": "Ford ",
+      "hide": false,
+      "c": "AVALANCHE GRAY",
+      "e": "3.5L Hybrid",
+      "wsticker": "https://www.carfax.com/phoenix/sticker/v4/FORD/TXhNozRvkgSipRg1QmKs0ne31U13KlUPj1OVLna5zcQ0XquPthPgQrkB-_ISjVbizbPittqtqakUEspDB0xJfPctWRpiP7rS7JFbgYEGGletxRNeCraGfS3ih90Ln-SMMAzqPG3SntmKr9bsO4KBC4dTn0Q3TpvEHMxL6wlfUwIO5Ym_yQTfggST3WpAa1M8li-NevhqbzclC5Rc4cUWSBTr2V15TxrgqEaw8ZCqkWumXjOq6Ro_LX0e7LWicmCWgDtyWRW7fbWPEXLXFcQBrsUvpBn_AvJFILaivITTNuf10eWxJTHrNy4RgsIkzLWLBHKK221Q8lYw9HSUW-02RuuqSr4DWGJ0urLwAjX0rfYDVRqNZvZUWD5CX-ZEZ7TBYKRzRaXXLFbLI4FeeRFtPihp3folgA.cfx",
+      "towing": 12700,
+      "hp": 420,
+      "battery_kwh": "",
+      "m": "F-150",
+      "dr": "4x4",
+      "p": 31000,
+      "imgs": [],
+      "desc": "• $3,000+ in Upgraded Suspension\n• Custom FOX Suspension\n• BDS Upper Control Arms\n• Leather Seats\n• 360° Camera\n• Tow Package\n• 20” Wheels",
+      "t": "Truck",
+      "sold": false,
+      "fuel": "Hybrid",
+      "pending": false,
+      "title": "Rebuilt",
+      "y": 2023,
+      "vin": "1FTFW1ED6PFD08887",
+      "asis": false,
+      "warranty": true,
+      "mi": 38700,
+      "tr": "Automatic"
     }
   ]
 }
