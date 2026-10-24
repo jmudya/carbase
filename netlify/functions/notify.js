@@ -2,7 +2,7 @@
 // Secrets are read from Netlify environment variables (never stored in the repository):
 //   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID                       -> Telegram message
 //   TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM, NOTIFY_SMS_TO -> SMS (optional)
-const TYPES = ["Car inquiry", "Service request", "US shipping quote", "International quote", "Find a car", "We buy your car"];
+const TYPES = ["Car inquiry", "Service request", "US shipping quote", "International quote", "Find a car", "We buy your car", "Europe shipping quote", "Other countries quote"];
 const ALLOWED = ["https://carbaseusa.com", "https://www.carbaseusa.com"];
 
 function clean(v, n) { return String(v == null ? "" : v).replace(/[\u0000-\u001f\u007f]+/g, " ").trim().slice(0, n || 500); }
