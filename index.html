@@ -38,7 +38,11 @@ h1{font:900 clamp(52px,13vw,120px)/.9 var(--head);margin:0 0 20px;text-transform
 section{padding:64px 0}
 h2{font:900 clamp(36px,7vw,56px)/1 var(--head);margin:0 0 8px;text-transform:uppercase}
 .sub{color:var(--muted);margin:0 0 28px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.flt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 16px;max-width:680px;margin-bottom:26px}
+.flt .fld{margin-bottom:0}
+@media(max-width:520px){.flt{grid-template-columns:1fr;gap:0}.flt .fld{margin-bottom:12px}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.chip small{opacity:.6;font-size:12px;margin-left:5px}
 .chip{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:999px;padding:8px 16px;font:500 15px var(--body);cursor:pointer}
 .chip[aria-pressed=true]{background:var(--text);color:var(--bg);border-color:var(--text)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
@@ -421,7 +425,7 @@ dialog#shm::backdrop{background:rgba(0,0,0,.68)}
 <section id="inventory"><div class="wrap">
 <h2 data-i="inv_h">Inventory</h2>
 <p class="sub" data-i="inv_sub">Pick a brand to see what we have on the lot.</p>
-<div class="chips" id="chips" data-render="" role="group" aria-label="Filter by brand"></div>
+<div id="chips" data-render=""></div>
 <div class="grid" id="grid" data-render="" aria-live="polite"></div>
 <p class="note ahint" data-admin="" hidden="">Edit mode: tap a car to edit it, or use + Add car in the bar below.</p>
 </div></section>
@@ -541,7 +545,7 @@ ad("ty:Sedan","Sedan","Седан","Седан");ad("ty:SUV","SUV","SUV","SUV");
 ad("co:Silver","Silver","Сріблястий","Серебристый");ad("co:White","White","Білий","Белый");ad("co:Blue","Blue","Синій","Синий");ad("co:Gray","Gray","Сірий","Серый");ad("co:Black","Black","Чорний","Чёрный");ad("co:Red","Red","Червоний","Красный");
 ad("tr:Automatic","Automatic","Автомат","Автомат");ad("tr:Single-speed","Single-speed","Одноступінчаста","Одноступенчатая");
 
-var sel="All",chips=document.getElementById("chips"),grid=document.getElementById("grid"),dlg=document.getElementById("dlg"),last=null;
+var sel="All",selModel="All",chips=document.getElementById("chips"),grid=document.getElementById("grid"),dlg=document.getElementById("dlg"),last=null;
 function fmt(n){return (+n||0).toLocaleString("en-US")}
 function has(x){return x!=null&&x!==""}
 function pr(c){return +c.p>0?"$"+fmt(c.p):ts("callp")}
@@ -573,13 +577,26 @@ else p.innerHTML=(a[k]?'<img src="'+im(a[k],1200)+'" data-o="'+a[k]+'" onerror="
 document.getElementById("dth").innerHTML=n>1?a.map(function(x,j){return '<button type="button" data-k="'+j+'" aria-label="Photo '+(j+1)+'"'+(j===k?' aria-current="true"':'')+'><img loading="lazy" src="'+im(x,160)+'" data-o="'+x+'" onerror="fb(this)" alt=""></button>'}).join("")+(hv?'<button type="button" class="vth" data-k="'+a.length+'" aria-label="Video"'+(k===a.length?' aria-current="true"':'')+'><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></button>':""):""}
 function draw(){
 grid.innerHTML=cars.map(function(c,i){
-if(sel!=="All"&&c.b!==sel)return"";
+if(sel!=="All"&&c.b!==sel)return"";if(selModel!=="All"&&c.m!==selModel)return"";
 return '<article class="card'+(c.sold?' is-sold':(c.pending?' is-pending':''))+'" role="button" tabindex="0" data-i="'+i+'" aria-label="View '+c.y+' '+c.b+' '+c.m+'"><div class="pic" aria-hidden="true">'+(ph(c)[0]?'<img loading="lazy" src="'+im(ph(c)[0],640)+'" data-o="'+ph(c)[0]+'" onerror="fb(this)" alt="">':art(c))+(c.sold?'<div class="sold"><span>'+ts("sold")+'</span></div>':(c.pending?'<div class="sold pend"><span>'+ts("pending")+'</span></div>':''))+'</div><div class="info"><h3>'+c.y+' '+c.b+' '+c.m+'</h3><div class="meta">'+meta(c)+'</div>'+(c.title?'<div class="ttl-s">'+ts("title")+': <b class="'+(c.title==="Rebuilt"?"rb":"cl")+'">'+tg("ti",c.title)+'</b></div>':'')+'<div class="price"><span'+(+c.p>0?'':' class="np"')+'>'+pr(c)+'</span><span class="tag">'+(EDIT?"Edit":c.sold?ts("sold"):c.pending?ts("pending"):ts("details"))+'</span></div></div></article>'}).join("")}
-function chipsDraw(){
-var brands=["All"].concat(cars.map(function(c){return c.b}).filter(function(v,i,a){return a.indexOf(v)===i}));
-chips.innerHTML="";
-brands.forEach(function(b){var el=document.createElement("button");el.className="chip";el.type="button";el.textContent=b==="All"?ts("all"):b;el.setAttribute("aria-pressed",b===sel);
-el.onclick=function(){sel=b;chipsDraw();draw()};chips.appendChild(el)})}
+var HG={"А":"A","В":"B","С":"C","Е":"E","Н":"H","К":"K","М":"M","О":"O","Р":"P","Т":"T","Х":"X","І":"I","а":"a","с":"c","е":"e","о":"o","р":"p","х":"x","у":"y","і":"i"};
+function nclean(v){return String(v==null?"":v).replace(/[А-яІі]/g,function(ch){return HG[ch]||ch}).replace(/[\u00a0\u200b\u2009]/g," ").replace(/\s+/g," ").trim()}
+function nkey(v){return nclean(v).toLowerCase().replace(/[^a-z0-9]/g,"")}
+function nmake(v){if(v!==v.toUpperCase()&&v!==v.toLowerCase())return v;if(v.length<=3)return v.toUpperCase();return v.toLowerCase().replace(/(^|[\s-])([a-z])/g,function(m,a,b){return a+b.toUpperCase()})}
+function normCars(list){var mk={},md={};list.forEach(function(c){var kb=nkey(c.b),km=kb+"|"+nkey(c.m);(mk[kb]=mk[kb]||[]).push(nclean(c.b));(md[km]=md[km]||[]).push(nclean(c.m))});
+function pick(a,f){var m=a.filter(function(v){return v!==v.toUpperCase()&&v!==v.toLowerCase()});return m.length?m[0]:f(a[0])}
+list.forEach(function(c){var kb=nkey(c.b),km=kb+"|"+nkey(c.m);c.b=pick(mk[kb],nmake);c.m=pick(md[km],function(v){return v})});return list}
+function chipsDraw(){var loc={en:"en",ua:"uk",ru:"ru",es:"es"}[L]||"en",mk={},md={};
+cars.forEach(function(c){mk[c.b]=(mk[c.b]||0)+1;if(sel==="All"||c.b===sel)md[c.m]=(md[c.m]||0)+1});
+if(selModel!=="All"&&!md[selModel])selModel="All";
+function opts(o,all,cur){return'<option value="All">'+all+'</option>'+Object.keys(o).sort(function(x,y){return x.localeCompare(y,loc,{numeric:true})}).map(function(k){return'<option value="'+k.replace(/"/g,"&quot;")+'"'+(k===cur?" selected":"")+'>'+k.replace(/</g,"&lt;")+' ('+o[k]+')</option>'}).join("")}
+chips.innerHTML='<div class="chips" id="chipsrow" role="group" aria-label="'+ts("f_make")+'"></div><div class="flt"><label class="fld"><span>'+ts("f_make")+'</span><select id="f_make">'+opts(mk,ts("f_allmk"),sel)+'</select></label><label class="fld"><span>'+ts("f_model")+'</span><select id="f_model">'+opts(md,ts("f_allmd"),selModel)+'</select></label></div>';
+var row=G("chipsrow");["All"].concat(Object.keys(mk).sort(function(x,y){return x.localeCompare(y,loc)})).forEach(function(k){var el=document.createElement("button");el.className="chip";el.type="button";el.setAttribute("aria-pressed",k===sel);
+el.innerHTML=(k==="All"?ts("all"):k.replace(/</g,"&lt;"))+(k==="All"?'<small>'+cars.length+'</small>':'<small>'+mk[k]+'</small>');
+el.onclick=function(){sel=k;selModel="All";chipsDraw();draw();track("filter_cars",{make:sel,model:selModel})};row.appendChild(el)});
+G("f_make").value=sel;G("f_model").value=selModel;
+G("f_make").onchange=function(){sel=this.value;selModel="All";chipsDraw();draw();track("filter_cars",{make:sel,model:selModel})};
+G("f_model").onchange=function(){selModel=this.value;draw();track("filter_cars",{make:sel,model:selModel})}}
 function openCar(i){
 var c=cars[i];last=document.activeElement;
 document.getElementById("dt").textContent=c.y+" "+c.b+" "+c.m;
@@ -1134,6 +1151,14 @@ ad("dst_eu","Europe","Європа","Европа");
 ad("dst_ua","Ukraine","Україна","Украина");
 ad("dst_world","Other countries","Інші країни","Другие страны");
 var ES14={"dl_ua": "Europa y otros países", "dst_l": "Destino", "dst_eu": "Europa", "dst_ua": "Ucrania", "dst_world": "Otros países"};for(var k in ES14)D.es[k]=ES14[k];
+ad("f_make","Make","Марка","Марка");
+ad("f_model","Model","Модель","Модель");
+ad("f_allmk","All makes","Усі марки","Все марки");
+ad("f_allmd","All models","Усі моделі","Все модели");
+ad("inv_sub","Choose a make and model to see what we have on the lot.","Оберіть марку й модель, щоб побачити, що є на майданчику.","Выберите марку и модель, чтобы увидеть, что есть на площадке.");
+var ES15={"f_make": "Marca", "f_model": "Modelo", "f_allmk": "Todas las marcas", "f_allmd": "Todos los modelos", "inv_sub": "Elija marca y modelo para ver lo que tenemos en el lote."};for(var k in ES15)D.es[k]=ES15[k];
+ad("inv_sub","Pick a brand, or choose a make and model, to see what we have on the lot.","Оберіть марку, або марку й модель, щоб побачити, що є на майданчику.","Выберите марку, или марку и модель, чтобы увидеть, что есть на площадке.");
+var ES16={"inv_sub": "Elija una marca, o marca y modelo, para ver lo que tenemos en el lote."};for(var k in ES16)D.es[k]=ES16[k];
 function applyLang(){
 document.documentElement.lang={en:"en",es:"es",ua:"uk",ru:"ru"}[L];
 var _y1=G("fd_y1").value,_y2=G("fd_y2").value;fillYears();G("fd_y1").value=_y1;G("fd_y2").value=_y2;
@@ -1143,7 +1168,7 @@ document.querySelectorAll("[data-ph]").forEach(function(e){e.placeholder=ts(e.da
 chipsDraw();draw();renderCfg();renderReviews();usEst();inCalc();navUpd();G("totop").setAttribute("aria-label",ts("totop"));G("totop").title=ts("totop")}
 document.querySelectorAll(".lb2 button").forEach(function(b){b.onclick=function(){L=b.dataset.l;track("change_language",{lang:L});try{localStorage.setItem("cblang",L)}catch(e){}applyLang()}});
 applyLang();
-Promise.all([fetch("data/cars.json").then(function(r){return r.json()}),fetch("data/settings.json").then(function(r){return r.json()}),jf("data/calc.json"),jf("data/reviews.json")]).then(function(r){cars=(r[0].cars||[]).filter(function(c){return !c.hide}).sort(function(a,b){function r(c){return c.sold?2:(c.pending?1:0)}return r(a)-r(b)});cfg=r[1]||{};CALC=r[2]||{};RV=(r[3]&&r[3].reviews)||[]}).catch(function(){}).then(function(){var y=new Date().getFullYear(),o="";for(var i=y+1;i>=y-30;i--)o+="<option"+(i===y-8?" selected":"")+">"+i+"</option>";G("in_year").innerHTML=o;if(!G("us_from").value)G("us_from").value=String((CALC.ship&&CALC.ship.from_zip)||"34689");applyLang();initAdmin();initGA();bindInputs();openFromUrl()});
+Promise.all([fetch("data/cars.json").then(function(r){return r.json()}),fetch("data/settings.json").then(function(r){return r.json()}),jf("data/calc.json"),jf("data/reviews.json")]).then(function(r){cars=(r[0].cars||[]).filter(function(c){return !c.hide}).sort(function(a,b){function r(c){return c.sold?2:(c.pending?1:0)}return r(a)-r(b)});normCars(cars);cfg=r[1]||{};CALC=r[2]||{};RV=(r[3]&&r[3].reviews)||[]}).catch(function(){}).then(function(){var y=new Date().getFullYear(),o="";for(var i=y+1;i>=y-30;i--)o+="<option"+(i===y-8?" selected":"")+">"+i+"</option>";G("in_year").innerHTML=o;if(!G("us_from").value)G("us_from").value=String((CALC.ship&&CALC.ship.from_zip)||"34689");applyLang();initAdmin();initGA();bindInputs();openFromUrl()});
 </script>
 
 
