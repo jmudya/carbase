@@ -24,6 +24,7 @@ collections:
               - {label: Year, name: y, widget: number, value_type: int, min: 1990, max: 2035}
               - {label: Make (brand), name: b, widget: string}
               - {label: Model, name: m, widget: string}
+              - {label: 'Model for the filter (optional: leave empty and it is detected automatically, e.g. F-150, Model 3)', name: mg, widget: string, required: false}
               - label: VIN
                 name: vin
                 widget: string

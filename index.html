@@ -58,6 +58,7 @@ h2{font:900 clamp(36px,7vw,56px)/1 var(--head);margin:0 0 8px;text-transform:upp
 .sub{color:var(--muted);margin:0 0 28px}
 .flt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 16px;max-width:680px;margin-bottom:26px}
 .flt .fld{margin-bottom:0}
+.flt select:disabled{opacity:.55;cursor:not-allowed}
 @media(max-width:520px){.flt{grid-template-columns:1fr;gap:0}.flt .fld{margin-bottom:12px}}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
 .chip small{opacity:.6;font-size:12px;margin-left:5px}
@@ -595,20 +596,31 @@ else p.innerHTML=(a[k]?'<img src="'+im(a[k],1200)+'" data-o="'+a[k]+'" onerror="
 document.getElementById("dth").innerHTML=n>1?a.map(function(x,j){return '<button type="button" data-k="'+j+'" aria-label="Photo '+(j+1)+'"'+(j===k?' aria-current="true"':'')+'><img loading="lazy" src="'+im(x,160)+'" data-o="'+x+'" onerror="fb(this)" alt=""></button>'}).join("")+(hv?'<button type="button" class="vth" data-k="'+a.length+'" aria-label="Video"'+(k===a.length?' aria-current="true"':'')+'><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></button>':""):""}
 function draw(){
 grid.innerHTML=cars.map(function(c,i){
-if(sel!=="All"&&c.b!==sel)return"";if(selModel!=="All"&&c.m!==selModel)return"";
+if(sel!=="All"&&c.b!==sel)return"";if(selModel!=="All"&&c.grp!==selModel)return"";
 return '<article class="card'+(c.sold?' is-sold':(c.pending?' is-pending':''))+'" role="button" tabindex="0" data-i="'+i+'" aria-label="View '+c.y+' '+c.b+' '+c.m+'"><div class="pic" aria-hidden="true">'+(ph(c)[0]?'<img loading="lazy" src="'+im(ph(c)[0],640)+'" data-o="'+ph(c)[0]+'" onerror="fb(this)" alt="">':art(c))+(c.sold?'<div class="sold"><span>'+ts("sold")+'</span></div>':(c.pending?'<div class="sold pend"><span>'+ts("pending")+'</span></div>':''))+'</div><div class="info"><h3>'+c.y+' '+c.b+' '+c.m+'</h3><div class="meta">'+meta(c)+'</div>'+(c.title?'<div class="ttl-s">'+ts("title")+': <b class="'+(c.title==="Rebuilt"?"rb":"cl")+'">'+tg("ti",c.title)+'</b></div>':'')+'<div class="price"><span'+(+c.p>0?'':' class="np"')+'>'+pr(c)+'</span><span class="tag">'+(EDIT?"Edit":c.sold?ts("sold"):c.pending?ts("pending"):ts("details"))+'</span></div></div></article>'}).join("")}
 var HG={"А":"A","В":"B","С":"C","Е":"E","Н":"H","К":"K","М":"M","О":"O","Р":"P","Т":"T","Х":"X","І":"I","а":"a","с":"c","е":"e","о":"o","р":"p","х":"x","у":"y","і":"i"};
 function nclean(v){return String(v==null?"":v).replace(/[А-яІі]/g,function(ch){return HG[ch]||ch}).replace(/[\u00a0\u200b\u2009]/g," ").replace(/\s+/g," ").trim()}
 function nkey(v){return nclean(v).toLowerCase().replace(/[^a-z0-9]/g,"")}
 function nmake(v){if(v!==v.toUpperCase()&&v!==v.toLowerCase())return v;if(v.length<=3)return v.toUpperCase();return v.toLowerCase().replace(/(^|[\s-])([a-z])/g,function(m,a,b){return a+b.toUpperCase()})}
-function normCars(list){var mk={},md={};list.forEach(function(c){var kb=nkey(c.b),km=kb+"|"+nkey(c.m);(mk[kb]=mk[kb]||[]).push(nclean(c.b));(md[km]=md[km]||[]).push(nclean(c.m))});
+var TWO={"grand cherokee":1,"grand caravan":1,"grand marquis":1,"grand prix":1,"grand am":1,"grand vitara":1,"santa fe":1,"santa cruz":1,"land cruiser":1,"land rover":1,"range rover":1,"town car":1,"crown victoria":1,"monte carlo":1,"mustang mach-e":1,"mach-e":1,"bolt ev":1,"bolt euv":1,"ioniq 5":1,"ioniq 6":1,"cx-30":0,"model s":1,"model x":1,"model y":1,"model 3":1};
+function baseModel(raw,make){var m=nclean(raw);if(!m)return"";
+var mm=m.match(/^model\s*([a-z0-9])(?![a-z0-9])/i);if(mm)return"Model "+mm[1].toUpperCase();
+var f=m.match(/^f[\s-]?(\d{2,3})(?![a-z0-9])/i);if(f&&/ford/i.test(make))return"F-"+f[1];
+var t=m.split(" "),a=t[0],b=(t[1]||"");
+if(b.toLowerCase()==="series")return a+" Series";
+if(t[1]&&TWO[(a+" "+b).toLowerCase()])return a+" "+b;
+return a}
+function pickM(a){var cnt={};a.forEach(function(v){cnt[v]=(cnt[v]||0)+1});var u=Object.keys(cnt);u.sort(function(x,y){var mx=(x!==x.toUpperCase()&&x!==x.toLowerCase())?1:0,my=(y!==y.toUpperCase()&&y!==y.toLowerCase())?1:0;return my-mx||cnt[y]-cnt[x]||y.length-x.length});return u[0]}
+function normCars(list){var mk={},md={},gm={};list.forEach(function(c){var kb=nkey(c.b),km=kb+"|"+nkey(c.m);(mk[kb]=mk[kb]||[]).push(nclean(c.b));(md[km]=md[km]||[]).push(nclean(c.m))});
 function pick(a,f){var m=a.filter(function(v){return v!==v.toUpperCase()&&v!==v.toLowerCase()});return m.length?m[0]:f(a[0])}
-list.forEach(function(c){var kb=nkey(c.b),km=kb+"|"+nkey(c.m);c.b=pick(mk[kb],nmake);c.m=pick(md[km],function(v){return v})});return list}
+list.forEach(function(c){var kb=nkey(c.b),km=kb+"|"+nkey(c.m);c.b=pick(mk[kb],nmake);c.m=pick(md[km],function(v){return v})});
+list.forEach(function(c){var raw=c.mg?nclean(c.mg):baseModel(c.m,c.b);c._r=raw;var k=nkey(c.b)+"|"+nkey(raw);(gm[k]=gm[k]||[]).push(raw)});
+list.forEach(function(c){c.grp=pickM(gm[nkey(c.b)+"|"+nkey(c._r)]);delete c._r});return list}
 function chipsDraw(){var loc={en:"en",ua:"uk",ru:"ru",es:"es"}[L]||"en",mk={},md={};
-cars.forEach(function(c){mk[c.b]=(mk[c.b]||0)+1;if(sel==="All"||c.b===sel)md[c.m]=(md[c.m]||0)+1});
+cars.forEach(function(c){mk[c.b]=(mk[c.b]||0)+1;if(sel!=="All"&&c.b===sel)md[c.grp]=(md[c.grp]||0)+1});
 if(selModel!=="All"&&!md[selModel])selModel="All";
 function opts(o,all,cur){return'<option value="All">'+all+'</option>'+Object.keys(o).sort(function(x,y){return x.localeCompare(y,loc,{numeric:true})}).map(function(k){return'<option value="'+k.replace(/"/g,"&quot;")+'"'+(k===cur?" selected":"")+'>'+k.replace(/</g,"&lt;")+' ('+o[k]+')</option>'}).join("")}
-chips.innerHTML='<div class="chips" id="chipsrow" role="group" aria-label="'+ts("f_make")+'"></div><div class="flt"><label class="fld"><span>'+ts("f_make")+'</span><select id="f_make">'+opts(mk,ts("f_allmk"),sel)+'</select></label><label class="fld"><span>'+ts("f_model")+'</span><select id="f_model">'+opts(md,ts("f_allmd"),selModel)+'</select></label></div>';
+chips.innerHTML='<div class="chips" id="chipsrow" role="group" aria-label="'+ts("f_make")+'"></div><div class="flt"><label class="fld"><span>'+ts("f_make")+'</span><select id="f_make">'+opts(mk,ts("f_allmk"),sel)+'</select></label><label class="fld"><span>'+ts("f_model")+'</span><select id="f_model"'+(sel==="All"?" disabled":"")+'>'+(sel==="All"?'<option value="All">'+ts("f_pickmk")+'</option>':opts(md,ts("f_allmd"),selModel))+'</select></label></div>';
 var row=G("chipsrow");["All"].concat(Object.keys(mk).sort(function(x,y){return x.localeCompare(y,loc)})).forEach(function(k){var el=document.createElement("button");el.className="chip";el.type="button";el.setAttribute("aria-pressed",k===sel);
 el.innerHTML=(k==="All"?ts("all"):k.replace(/</g,"&lt;"))+(k==="All"?'<small>'+cars.length+'</small>':'<small>'+mk[k]+'</small>');
 el.onclick=function(){sel=k;selModel="All";chipsDraw();draw();track("filter_cars",{make:sel,model:selModel})};row.appendChild(el)});
@@ -1177,6 +1189,8 @@ ad("inv_sub","Choose a make and model to see what we have on the lot.","Обер
 var ES15={"f_make": "Marca", "f_model": "Modelo", "f_allmk": "Todas las marcas", "f_allmd": "Todos los modelos", "inv_sub": "Elija marca y modelo para ver lo que tenemos en el lote."};for(var k in ES15)D.es[k]=ES15[k];
 ad("inv_sub","Pick a brand, or choose a make and model, to see what we have on the lot.","Оберіть марку, або марку й модель, щоб побачити, що є на майданчику.","Выберите марку, или марку и модель, чтобы увидеть, что есть на площадке.");
 var ES16={"inv_sub": "Elija una marca, o marca y modelo, para ver lo que tenemos en el lote."};for(var k in ES16)D.es[k]=ES16[k];
+ad("f_pickmk","Select a make first","Спочатку оберіть марку","Сначала выберите марку");
+var ES17={"f_pickmk": "Primero elija una marca"};for(var k in ES17)D.es[k]=ES17[k];
 function applyLang(){
 document.documentElement.lang={en:"en",es:"es",ua:"uk",ru:"ru"}[L];
 var _y1=G("fd_y1").value,_y2=G("fd_y2").value;fillYears();G("fd_y1").value=_y1;G("fd_y2").value=_y2;
