@@ -1,2 +1,3 @@
+/sitemap.xml  /.netlify/functions/sitemap  200
 /car/:slug/  /.netlify/functions/car?slug=:slug  200
 /car/:slug   /.netlify/functions/car?slug=:slug  200
