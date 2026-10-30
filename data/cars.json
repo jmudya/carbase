@@ -350,6 +350,29 @@
       "warranty": true,
       "mi": 70700,
       "tr": "Automatic"
+    },
+    {
+      "b": "Tesla",
+      "hide": false,
+      "c": "WHITE",
+      "hp": 390,
+      "carfax": "/uploads/скоро_-автомобиль-под-покрывалом.png",
+      "battery_kwh": 82,
+      "battery_type": "NCA",
+      "m": "Model Y Long Range Dual Motor (HW4)",
+      "dr": "Dual Motor AWD",
+      "p": 25000,
+      "desc": "2023 Tesla Model Y Long Range AWD\n\nDual Motor AWD\n7-Seater – Third-Row Seating\nWhite Premium Interior\nAutopilot Included\nFull Self-Driving Computer (Hardware) 4\nTinted Windows\nLong Range Battery\nApproximately 390 HP\nPanoramic Glass Roof\nPremium Sound System\nHeated Front and Rear Seats\nHeated Steering Wheel\nPower Liftgate\nSupercharging Compatible",
+      "t": "EV",
+      "sold": false,
+      "fuel": "Electric",
+      "pending": false,
+      "title": "Rebuilt",
+      "y": 2023,
+      "vin": "7SAYGAEE4PF931561",
+      "asis": false,
+      "warranty": true,
+      "mi": 31000
     }
   ]
 }
