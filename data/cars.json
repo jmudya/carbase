@@ -373,6 +373,29 @@
       "vin": "JTHBW1GG2D2023143",
       "mi": 197950,
       "tr": "CVT"
+    },
+    {
+      "b": "Tesla",
+      "hide": false,
+      "c": "WHIRTE",
+      "hp": 425,
+      "carfax": "/uploads/скоро_-автомобиль-под-покрывалом.png",
+      "battery_kwh": 82,
+      "battery_type": "NCA",
+      "m": "Model 3 Long Range Dual Motor",
+      "dr": "AWD",
+      "p": 17000,
+      "desc": "2021 Tesla Model 3 Long Range AWD\n\nDual Motor – All-Wheel Drive (AWD)\nUp to 425 HP\n0–60 MPH in 4.2 Seconds\nLong Range Battery – Up to 310 Miles EPA Range\nPremium Interior\nPremium Audio System\nPanoramic Glass Roof\nHeated Front and Rear Seats\nHeated Steering Wheel\nPower Adjustable Front Seats\n15-Inch Touchscreen Display\nNavigation & Bluetooth\nWireless Phone Charging\nAutopilot\nRearview & Side Cameras\nTesla Supercharger Compatible\n\n",
+      "t": "EV",
+      "sold": false,
+      "fuel": "Electric",
+      "pending": false,
+      "title": "Clean",
+      "y": 2021,
+      "vin": "5YJ3E1EB6MF988276",
+      "asis": true,
+      "warranty": false,
+      "mi": 66400
     }
   ]
 }
