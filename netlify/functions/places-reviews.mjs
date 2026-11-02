@@ -16,7 +16,8 @@ export default async (req) => {
   const key = env("GOOGLE_PLACES_API_KEY");
   if (!key) return J({ ok: false, error: "GOOGLE_PLACES_API_KEY is not set" });
   const site = req.headers.get("sec-fetch-site");
-  if (site && site !== "same-origin") return J({ ok: false, error: "not allowed" }, 403);
+  // same-origin = our own page; none = the address typed in the browser (used for checking). Requests made by other sites are refused.
+  if (site && site !== "same-origin" && site !== "none") return J({ ok: false, error: "not allowed" }, 403);
   const day = new Date().toISOString().slice(0, 10);
   if (day !== dayKey) { dayKey = day; dayCount = 0; }
   const max = Number(env("GOOGLE_DAILY_MAX")) || 150;
