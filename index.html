@@ -966,15 +966,15 @@ return '<article class="rv"><div class="stars" aria-label="'+(+r.rating||5)+' / 
 function rvNav(){var t=G("rv_list");if(!t)return;var max=t.scrollWidth-t.clientWidth;G("rv_prev").disabled=t.scrollLeft<4;G("rv_next").disabled=t.scrollLeft>max-4;G("rv_c").classList.toggle("noarrows",max<6)}
 function rvClamp(){document.querySelectorAll("#rv_list .rv").forEach(function(c){var t=c.querySelector(".rvt"),b=c.querySelector(".rvmore");if(!t||!b)return;var was=c.classList.contains("open");c.classList.remove("open");var over=t.scrollHeight>t.clientHeight+2;if(was)c.classList.add("open");b.hidden=!(over||was);b.textContent=ts(was?"rv_less":"rv_more")})}
 function rvStep(d){var t=G("rv_list"),c=t.querySelector(".rv");if(!c)return;var w=c.offsetWidth+16,n=Math.max(1,Math.floor((t.clientWidth+16)/w));t.scrollBy({left:d*w*n,behavior:"smooth"})}
-function renderReviews(){var a=rvList(),sec=G("reviews"),emb=String(cfg.rv_embed||"").trim(),gg=GREV&&GREV.reviews&&GREV.reviews.length;
-sec.hidden=!(a.length||emb);G("nav_rv").hidden=sec.hidden;if(emb)injectEmbed(emb);
+function renderReviews(){var a=rvList(),sec=G("reviews"),emb=String(cfg.rv_embed||"").trim(),gg=GREV&&GREV.reviews&&GREV.reviews.length,ed=/[?&]edit=1(&|$)/.test(location.search)&&/^[A-Za-z0-9_-]{10,200}$/.test(String(cfg.gpid||"").trim()),edn='<span>Google reviews are loaded on the live site only. Here they are hidden so that no Google requests are used.</span>';
+sec.hidden=!(a.length||emb||ed);G("nav_rv").hidden=sec.hidden;if(emb)injectEmbed(emb);
 var l=G("rv_leave");l.hidden=!cfg.gr;if(cfg.gr)l.href=url(cfg.gr);
-if(!a.length){G("rv_sum").innerHTML="";G("rv_list").innerHTML="";G("rv_c").hidden=true;G("rv_g").hidden=true;return}
+if(!a.length){G("rv_sum").innerHTML="";G("rv_list").innerHTML="";G("rv_c").hidden=true;G("rv_g").hidden=!ed;if(ed)G("rv_g").innerHTML=edn;return}
 G("rv_c").hidden=false;
 if(GREV&&+GREV.rating>0&&+GREV.count>0){G("rv_sum").innerHTML='<span class="rvs-a">'+(+GREV.rating).toFixed(1)+'</span><span class="stars">'+stars(GREV.rating)+'</span><span class="rvs-n">'+ts("rv_gcnt").replace("%s",+GREV.count)+'</span>'+(GREV.mapsUri&&/^https:\/\//i.test(GREV.mapsUri)?'<span class="rvs-a2"><a href="'+cl(GREV.mapsUri)+'" target="_blank" rel="noopener">'+ts("rv_all")+'</a></span>':'')}
 else{var avg=a.reduce(function(t,r){return t+(+r.rating||5)},0)/a.length;G("rv_sum").innerHTML='<span class="rvs-a">'+avg.toFixed(1)+'</span><span class="stars">'+stars(avg)+'</span><span class="rvs-n">'+ts("rv_cnt").replace("%s",a.length)+'</span>'}
 G("rv_list").innerHTML=a.map(rvCard).join("");
-var g=G("rv_g");g.hidden=!gg;if(gg)g.innerHTML='<span class="gmp">Google Maps</span><span>'+ts("rv_g")+'</span>';
+var g=G("rv_g");g.hidden=!(gg||ed);if(gg)g.innerHTML='<span class="gmp">Google Maps</span><span>'+ts("rv_g")+'</span>';else if(ed)g.innerHTML=edn;
 G("rv_list").scrollLeft=0;rvNav();rvClamp()}
 G("rv_prev").onclick=function(){rvStep(-1)};G("rv_next").onclick=function(){rvStep(1)};
 G("rv_list").addEventListener("scroll",rvNav,{passive:true});
@@ -982,9 +982,12 @@ G("rv_list").addEventListener("keydown",function(e){if(e.key==="ArrowRight"){e.p
 G("rv_list").addEventListener("click",function(e){var b=e.target.closest(".rvmore");if(!b)return;var c=b.closest(".rv");c.classList.toggle("open");b.textContent=ts(c.classList.contains("open")?"rv_less":"rv_more");rvNav()});
 window.addEventListener("resize",function(){rvNav();rvClamp()});
 /* Google reviews: the Netlify function asks Google only when the visitor gets near the reviews, and only if a Place ID is set */
-function loadGoogleReviews(){var id=String(cfg.gpid||"").trim();if(!/^[A-Za-z0-9_-]{10,200}$/.test(id)||/[?&]edit=1(&|$)/.test(location.search)||window.__gr)return;window.__gr=1;
+var RVMAX=3;
+function rvQ(){try{var t=new Date().toISOString().slice(0,10),v=JSON.parse(localStorage.getItem("cb_rvq")||"{}");return v&&v.d===t?v:{d:t,n:0}}catch(e){return{d:"",n:0}}}
+function rvUse(){try{var v=rvQ();v.n++;localStorage.setItem("cb_rvq",JSON.stringify(v))}catch(e){}}
+function loadGoogleReviews(){var id=String(cfg.gpid||"").trim();if(!/^[A-Za-z0-9_-]{10,200}$/.test(id)||window.__gr||rvQ().n>=RVMAX)return;window.__gr=1;
 var tg=G("reviews").hidden?G("delivery"):G("reviews");
-function go(){fetch("/api/google-reviews",{cache:"no-store"}).then(function(r){return r.json()}).then(function(j){if(j&&j.ok&&j.reviews&&j.reviews.length){GREV=j;renderReviews()}}).catch(function(){})}
+function go(){rvUse();fetch("/api/google-reviews",{cache:"no-store"}).then(function(r){return r.json()}).then(function(j){if(j&&j.ok&&j.reviews&&j.reviews.length){GREV=j;renderReviews()}}).catch(function(){})}
 if("IntersectionObserver" in window&&tg){var io=new IntersectionObserver(function(es){if(es[0].isIntersecting){io.disconnect();go()}},{rootMargin:"500px"});io.observe(tg)}else go()}
 function nv(o,k){var v=(o||{})[k];if(v===""||v==null)return null;v=+v;return isNaN(v)?null:v}
 function zipsLoad(){return ZP||(ZP=fetch("/data/zips.json").then(function(r){return r.json()}).then(function(j){ZIPS=j;return j}).catch(function(){ZP=null;return null}))}
