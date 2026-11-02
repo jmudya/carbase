@@ -1191,6 +1191,11 @@ ad("inv_sub","Pick a brand, or choose a make and model, to see what we have on t
 var ES16={"inv_sub": "Elija una marca, o marca y modelo, para ver lo que tenemos en el lote."};for(var k in ES16)D.es[k]=ES16[k];
 ad("f_pickmk","Select a make first","Спочатку оберіть марку","Сначала выберите марку");
 var ES17={"f_pickmk": "Primero elija una marca"};for(var k in ES17)D.es[k]=ES17[k];
+var TXD={};
+function applyTexts(T){
+Object.keys(TXD).forEach(function(id){var p=id.split("|"),o=TXD[id];if(o.has)D[p[0]][p[1]]=o.v;else delete D[p[0]][p[1]]});TXD={};
+if(!T||typeof T!=="object")return;
+Object.keys(T).forEach(function(k){var v=T[k];if(!v||typeof v!=="object")return;["en","ua","ru","es"].forEach(function(l){var x=v[l];if(typeof x!=="string"||!x.trim())return;var id=l+"|"+k;TXD[id]={has:Object.prototype.hasOwnProperty.call(D[l],k),v:D[l][k]};D[l][k]=x.replace(/[<>]/g,"").slice(0,2000)})})}
 function applyLang(){
 document.documentElement.lang={en:"en",es:"es",ua:"uk",ru:"ru"}[L];
 var _y1=G("fd_y1").value,_y2=G("fd_y2").value;fillYears();G("fd_y1").value=_y1;G("fd_y2").value=_y2;
@@ -1200,7 +1205,7 @@ document.querySelectorAll("[data-ph]").forEach(function(e){e.placeholder=ts(e.da
 chipsDraw();draw();renderCfg();renderReviews();usEst();inCalc();navUpd();G("totop").setAttribute("aria-label",ts("totop"));G("totop").title=ts("totop")}
 document.querySelectorAll(".lb2 button").forEach(function(b){b.onclick=function(){L=b.dataset.l;track("change_language",{lang:L});try{localStorage.setItem("cblang",L)}catch(e){}applyLang()}});
 applyLang();
-Promise.all([fetch("data/cars.json").then(function(r){return r.json()}),fetch("data/settings.json").then(function(r){return r.json()}),jf("data/calc.json"),jf("data/reviews.json")]).then(function(r){cars=(r[0].cars||[]).filter(function(c){return !c.hide}).sort(function(a,b){function r(c){return c.sold?2:(c.pending?1:0)}return r(a)-r(b)});normCars(cars);cfg=r[1]||{};CALC=r[2]||{};RV=(r[3]&&r[3].reviews)||[]}).catch(function(){}).then(function(){var y=new Date().getFullYear(),o="";for(var i=y+1;i>=y-30;i--)o+="<option"+(i===y-8?" selected":"")+">"+i+"</option>";G("in_year").innerHTML=o;if(!G("us_from").value)G("us_from").value=String((CALC.ship&&CALC.ship.from_zip)||"34689");applyLang();initAdmin();initGA();bindInputs();openFromUrl();window.__siteReady=true});
+Promise.all([fetch("data/cars.json").then(function(r){return r.json()}),fetch("data/settings.json").then(function(r){return r.json()}),jf("data/calc.json"),jf("data/reviews.json"),jf("data/texts.json")]).then(function(r){applyTexts(r[4]&&r[4].texts);cars=(r[0].cars||[]).filter(function(c){return !c.hide}).sort(function(a,b){function r(c){return c.sold?2:(c.pending?1:0)}return r(a)-r(b)});normCars(cars);cfg=r[1]||{};CALC=r[2]||{};RV=(r[3]&&r[3].reviews)||[]}).catch(function(){}).then(function(){var y=new Date().getFullYear(),o="";for(var i=y+1;i>=y-30;i--)o+="<option"+(i===y-8?" selected":"")+">"+i+"</option>";G("in_year").innerHTML=o;if(!G("us_from").value)G("us_from").value=String((CALC.ship&&CALC.ship.from_zip)||"34689");applyLang();initAdmin();initGA();bindInputs();openFromUrl();window.__siteReady=true});
 </script>
 
 

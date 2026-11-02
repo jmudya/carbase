@@ -57,7 +57,7 @@ async function getFile(path) {
   } catch (e) { if (e.status === 404) return { sha: "", data: null }; throw e; }
 }
 async function load() {
-  var r = await Promise.all([getFile("data/cars.json"), getFile("data/settings.json"), getFile("data/calc.json"), getFile("data/reviews.json")]);
+  var r = await Promise.all([getFile("data/cars.json"), getFile("data/settings.json"), getFile("data/calc.json"), getFile("data/reviews.json"), getFile("data/texts.json")]);
   var ref = await gh("/git/ref/heads/" + encodeURIComponent(BRANCH));
   S.headSha = ref.object.sha;
   var cd = r[0].data || { cars: [] };
@@ -68,10 +68,12 @@ async function load() {
     cars: { path: "data/cars.json", sha: r[0].sha },
     settings: { path: "data/settings.json", sha: r[1].sha, data: r[1].data || {} },
     calc: { path: "data/calc.json", sha: r[2].sha, data: r[2].data || {} },
-    reviews: { path: "data/reviews.json", sha: r[3].sha, data: r[3].data || { reviews: [] } }
+    reviews: { path: "data/reviews.json", sha: r[3].sha, data: r[3].data || { reviews: [] } },
+    texts: { path: "data/texts.json", sha: r[4].sha, data: r[4].data || {} }
   };
+  if (!S.files.texts.data.texts || typeof S.files.texts.data.texts !== "object") S.files.texts.data.texts = {};
   if (!Array.isArray(S.files.reviews.data.reviews)) S.files.reviews.data.reviews = [];
-  ["settings", "calc", "reviews"].forEach(function (k) { S.files[k].orig = JSON.stringify(S.files[k].data); });
+  ["settings", "calc", "reviews", "texts"].forEach(function (k) { S.files[k].orig = JSON.stringify(S.files[k].data); });
 }
 function carChanges() {
   var added = 0, changed = 0, deleted = 0, seen = {};
@@ -84,7 +86,7 @@ function carChanges() {
 }
 function fileChanged(k) { var f = S.files[k]; return JSON.stringify(f.data) !== f.orig; }
 function carsFileData() { var o = Object.assign({}, S.extra); o.cars = S.cars.map(function (x) { return x.d; }); return o; }
-function dirtyCount() { var c = carChanges(); return c.added + c.changed + c.deleted + ["settings", "calc", "reviews"].filter(fileChanged).length; }
+function dirtyCount() { var c = carChanges(); return c.added + c.changed + c.deleted + ["settings", "calc", "reviews", "texts"].filter(fileChanged).length; }
 function usedUploads() {
   var txt = JSON.stringify([carsFileData(), S.files.settings.data, S.files.calc.data, S.files.reviews.data]);
   return Object.keys(S.uploads).filter(function (p) { return !S.uploads[p].done && txt.indexOf('"/' + p + '"') > -1; });
@@ -111,11 +113,12 @@ function applyView() {
 function applySettings() { window.cfg = clone(S.files.settings.data); window.renderCfg(); }
 function applyCalc() { window.CALC = clone(S.files.calc.data); window.usEst(); window.inCalc(); }
 function applyReviews() { window.RV = clone(S.files.reviews.data.reviews || []); window.renderReviews(); }
+function applyTextsView() { window.applyTexts(S.files.texts.data.texts); window.applyLang(); }
 var tm = null;
 function touch(what) {
   clearTimeout(tm);
   tm = setTimeout(function () {
-    if (what === "cars") applyView(); else if (what === "settings") applySettings(); else if (what === "calc") applyCalc(); else if (what === "reviews") applyReviews();
+    if (what === "cars") applyView(); else if (what === "settings") applySettings(); else if (what === "calc") applyCalc(); else if (what === "reviews") applyReviews(); else if (what === "texts") applyTextsView();
     updateBar();
   }, 120);
   updateBar();
@@ -150,6 +153,13 @@ function allErrors() {
   var g = SCHEMA.settings.ga; var m = validate(g, S.files.settings.data.ga); if (m) out.push({ where: "settings", name: "Contacts and links", label: "Google Analytics ID", msg: m });
   (S.files.reviews.data.reviews || []).forEach(function (r, i) {
     ["name", "text"].forEach(function (k) { if (!String(r[k] || "").trim()) out.push({ where: "reviews", name: "Review " + (i + 1), label: SCHEMA.reviews[k].label.split(" (")[0], msg: "Required" }); });
+  });
+  var ov = S.files.texts.data.texts;
+  Object.keys(ov).forEach(function (k) {
+    LANGS.forEach(function (L) {
+      var v = ov[k][L[0]]; if (typeof v !== "string") return;
+      if (/%s/.test(origText(L[0], k) || "") && !/%s/.test(v)) out.push({ where: "text", key: k, name: "Text " + (window.D.en[k] || k).slice(0, 40), label: L[1], msg: "keep %s in the text (it is replaced by a number)" });
+    });
   });
   return out;
 }
@@ -414,6 +424,86 @@ function openReviews() {
   sh.foot.appendChild(h("span", { class: "ve-sp1" })); sh.foot.appendChild(h("button", { type: "button", class: "ve-btn pri", text: "Done", onclick: closePanel }));
 }
 
+/* ---------- page texts ---------- */
+var LANGS = [["en", "English"], ["ua", "Українська"], ["ru", "Русский"], ["es", "Español"]];
+function origText(l, k) { var id = l + "|" + k; return window.TXD && window.TXD[id] ? window.TXD[id].v : window.D[l][k]; }
+function ovAll() { return S.files.texts.data.texts; }
+function textGroup(k) {
+  var el = document.querySelector('[data-i="' + k + '"]');
+  if (!el) return "Messages and labels used by the site scripts";
+  if (el.closest("dialog")) return "Car page and pop-up windows";
+  if (el.closest("header")) return "Header";
+  if (el.closest("nav")) return "Menu";
+  if (el.closest(".hero")) return "Top block";
+  if (el.closest("footer")) return "Footer";
+  var sec = el.closest("section[id]"), names = { inventory: "Inventory", find: "Find me a car", about: "About us", services: "Services", buy: "We buy cars", delivery: "Delivery", reviews: "Customer reviews", contact: "Visit the lot (contact)" };
+  return sec ? (names[sec.id] || "Other page texts") : "Other page texts";
+}
+var TEXT_ORDER = ["Menu", "Header", "Top block", "Inventory", "Find me a car", "About us", "Services", "We buy cars", "Delivery", "Customer reviews", "Visit the lot (contact)", "Footer", "Other page texts", "Car page and pop-up windows", "Messages and labels used by the site scripts"];
+function shownText(k) { var L = window.L || "en"; return window.D[L][k] || window.D.en[k] || k; }
+function openTexts() {
+  S.panel = "texts"; closeMenu();
+  var sh = panelShell("Page texts", "Click a text to edit it in all 4 languages. Tip: press Aa Texts in the bar and click a text right on the page.");
+  var q = h("input", { type: "text", placeholder: "Search texts...", autocomplete: "off" });
+  sh.body.appendChild(h("div", { class: "ve-f", style: "margin-top:14px" }, [q]));
+  var list = h("div"), keys = {};
+  LANGS.forEach(function (L) { Object.keys(window.D[L[0]]).forEach(function (k) { keys[k] = 1; }); });
+  var groups = {}; Object.keys(keys).forEach(function (k) { var g = textGroup(k); (groups[g] = groups[g] || []).push(k); });
+  function render() {
+    list.innerHTML = ""; var term = q.value.trim().toLowerCase();
+    TEXT_ORDER.forEach(function (g) {
+      var items = (groups[g] || []).filter(function (k) { return !term || k.toLowerCase().indexOf(term) > -1 || LANGS.some(function (L) { return String(window.D[L[0]][k] || "").toLowerCase().indexOf(term) > -1; }); });
+      if (!items.length) return;
+      list.appendChild(h("div", { class: "ve-gh", text: g + " (" + items.length + ")" }));
+      items.forEach(function (k) {
+        var t = shownText(k); if (t.length > 110) t = t.slice(0, 108) + "…";
+        list.appendChild(h("button", { type: "button", class: "ve-ti", onclick: function () { openTextKey(k, true); } }, [h("span", { text: t }), ovAll()[k] ? h("span", { class: "ve-ed", text: "edited" }) : null]));
+      });
+    });
+    if (!list.children.length) list.appendChild(h("p", { class: "ve-sm", text: "Nothing found." }));
+  }
+  q.addEventListener("input", render); render(); sh.body.appendChild(list);
+  sh.foot.appendChild(h("span", { class: "ve-sp1" })); sh.foot.appendChild(h("button", { type: "button", class: "ve-btn pri", text: "Done", onclick: closePanel }));
+}
+function openTextKey(key, fromList) {
+  S.panel = "text"; closeMenu();
+  var sh = panelShell("Edit text", textGroup(key) + ". Leave a language empty to keep the original text.");
+  var ov = ovAll(), cur = window.L || "en";
+  LANGS.forEach(function (L) {
+    var l = L[0], orig = origText(l, key) || "", have = ov[key] && typeof ov[key][l] === "string";
+    var lab = h("label", { class: "ve-l" }), box = h("div", { class: "ve-f" });
+    var ta = h("textarea", { rows: Math.min(8, Math.max(2, Math.ceil((have ? ov[key][l] : orig).length / 55))), placeholder: orig || "(empty)" });
+    ta.value = have ? ov[key][l] : orig;
+    function label() { var e = ov[key] && typeof ov[key][l] === "string"; lab.textContent = L[1] + (l === cur ? "  ·  shown on the page now" : "") + (e ? "  ·  edited" : ""); }
+    ta.addEventListener("input", function () {
+      var v = ta.value, o = ov[key] || (ov[key] = {});
+      if (!v.trim() || v === orig) delete o[l]; else o[l] = v;
+      if (!Object.keys(o).length) delete ov[key];
+      label(); touch("texts");
+    });
+    label(); box.appendChild(lab); box.appendChild(ta); sh.body.appendChild(box);
+  });
+  if (/%s/.test(origText("en", key) || "")) sh.body.appendChild(h("p", { class: "ve-sm", text: "Keep %s in the text: the site replaces it with a number." }));
+  sh.body.appendChild(h("p", { class: "ve-sm", text: "Plain text only: the characters < and > are removed." }));
+  sh.foot.appendChild(h("button", { type: "button", class: "ve-btn", text: "Reset to original", onclick: function () { delete ov[key]; touch("texts"); openTextKey(key, fromList); toast("Original text restored"); } }));
+  sh.foot.appendChild(h("span", { class: "ve-sp1" }));
+  if (fromList) sh.foot.appendChild(h("button", { type: "button", class: "ve-btn", text: "← All texts", onclick: openTexts }));
+  sh.foot.appendChild(h("button", { type: "button", class: "ve-btn pri", text: "Done", onclick: closePanel }));
+}
+function toggleTextMode(on) {
+  S.textMode = on == null ? !S.textMode : on;
+  document.body.classList.toggle("ve-txm", S.textMode);
+  var b = $("#ve-tx"); if (b) { b.textContent = S.textMode ? "Aa Texts: ON" : "Aa Texts"; b.classList.toggle("on", S.textMode); }
+  if (S.textMode) toast("Click any text on the page to edit it");
+}
+function textClick(e) {
+  if (!S.textMode || S.preview) return;
+  if (e.target.closest("#ve-root")) return;
+  var el = e.target.closest("[data-i]");
+  if (!el || el.closest("dialog")) return;
+  e.preventDefault(); e.stopPropagation(); openTextKey(el.dataset.i);
+}
+
 /* ---------- menu, bar, modal ---------- */
 function closeMenu() { var m = $("#ve-menu"); if (m) m.classList.remove("open"); }
 function modal(title, bodyEl, buttons) {
@@ -434,14 +524,15 @@ function buildUI() {
   root.appendChild(h("div", { id: "ve-bar", class: "ve-bar" }, [
     h("button", { type: "button", class: "ve-btn", id: "ve-menubtn", text: "☰ Menu", onclick: function () { $("#ve-menu").classList.toggle("open"); } }),
     h("span", { id: "ve-status", text: "" }), h("span", { class: "ve-sp1" }),
-    h("button", { type: "button", class: "ve-btn", id: "ve-prev", text: "Preview", onclick: function () { S.preview = !S.preview; document.body.classList.toggle("ve-prev", S.preview); $("#ve-prev").textContent = S.preview ? "Back to editing" : "Preview"; closePanel(); applyView(); } }),
+    h("button", { type: "button", class: "ve-btn", id: "ve-tx", text: "Aa Texts", onclick: function () { if (S.preview) return; toggleTextMode(); } }),
+    h("button", { type: "button", class: "ve-btn", id: "ve-prev", text: "Preview", onclick: function () { S.preview = !S.preview; if (S.preview) toggleTextMode(false); document.body.classList.toggle("ve-prev", S.preview); $("#ve-prev").textContent = S.preview ? "Back to editing" : "Preview"; closePanel(); applyView(); } }),
     h("button", { type: "button", class: "ve-btn", id: "ve-discard", text: "Discard", hidden: true, onclick: discardAll }),
     h("button", { type: "button", class: "ve-btn pri", id: "ve-save", text: "Save changes", onclick: saveFlow }),
     h("button", { type: "button", class: "ve-btn", id: "ve-exit", text: "Exit", onclick: exitEditor })]));
   var menu = h("aside", { id: "ve-menu", class: "ve-menu" }, [h("div", { class: "ve-mh" }, [h("b", { text: "Site editor" }), h("button", { type: "button", class: "ve-x", text: "✕", onclick: closeMenu })])]);
   [["Cars", function () { closeMenu(); var i = $("#inventory"); if (i) i.scrollIntoView({ behavior: "smooth" }); }],
   ["+ Add car", function () { addCar(); }],
-  ["Contacts and links", openSettings], ["Delivery rates and warranty", openCalc], ["Customer reviews", openReviews],
+  ["Page texts (headings, descriptions, buttons)", openTexts], ["Contacts and links", openSettings], ["Delivery rates and warranty", openCalc], ["Customer reviews", openReviews],
   ["Classic admin (old way)", function () { window.open("/admin/", "_blank"); }]].forEach(function (it) { menu.appendChild(h("button", { type: "button", class: "ve-mi", text: it[0], onclick: it[1] })); });
   menu.appendChild(h("p", { class: "ve-hint", text: "Tip: click a car to edit it, or the pencil buttons next to page blocks. Nothing goes to the site until you press Save changes." }));
   root.appendChild(menu); root.appendChild(h("aside", { id: "ve-panel", class: "ve-panel" })); root.appendChild(h("div", { id: "ve-modal", class: "ve-modal" })); root.appendChild(h("div", { id: "ve-toast" }));
@@ -489,7 +580,7 @@ function discardAll() {
 async function reloadAll(msg) {
   try { await load(); } catch (e) { toast(e.message, true); return; }
   S.uploads = Object.keys(S.uploads).reduce(function (o, k) { if (S.uploads[k].done) o[k] = S.uploads[k]; return o; }, {});
-  applyView(); applySettings(); applyCalc(); applyReviews(); updateBar(); if (msg) toast(msg);
+  applyView(); applySettings(); applyCalc(); applyReviews(); applyTextsView(); updateBar(); if (msg) toast(msg);
 }
 function exitEditor() {
   function leave() { S.leaving = true; location.href = "/"; }
@@ -507,6 +598,7 @@ function summaryEl() {
   if (fileChanged("settings")) ul.appendChild(h("li", { text: "Contacts and links changed" }));
   if (fileChanged("calc")) ul.appendChild(h("li", { text: "Delivery rates or warranty changed" }));
   if (fileChanged("reviews")) ul.appendChild(h("li", { text: "Customer reviews changed" }));
+  if (fileChanged("texts")) ul.appendChild(h("li", { text: "Page texts changed (" + Object.keys(S.files.texts.data.texts).length + ")" }));
   var n = usedUploads().length; if (n) ul.appendChild(h("li", { text: n + " new photo/file" + (n > 1 ? "s" : "") + " to upload" }));
   return ul;
 }
@@ -514,7 +606,7 @@ function commitMessage() {
   var c = carChanges(), p = [];
   if (c.added) p.push(c.added + " added"); if (c.changed) p.push(c.changed + " changed"); if (c.deleted) p.push(c.deleted + " deleted");
   var m = "Edit site: " + (p.length ? "cars " + p.join(", ") : "");
-  var o = []; if (fileChanged("settings")) o.push("contacts"); if (fileChanged("calc")) o.push("rates"); if (fileChanged("reviews")) o.push("reviews");
+  var o = []; if (fileChanged("settings")) o.push("contacts"); if (fileChanged("calc")) o.push("rates"); if (fileChanged("reviews")) o.push("reviews"); if (fileChanged("texts")) o.push("texts");
   return (m + (p.length && o.length ? "; " : "") + o.join(", ")).replace(/: $/, "").trim();
 }
 function saveFlow() {
@@ -523,7 +615,7 @@ function saveFlow() {
   if (errs.length) {
     var ul = h("ul", { class: "ve-sum" });
     errs.slice(0, 12).forEach(function (e) {
-      ul.appendChild(h("li", null, [h("b", { text: e.name + ": " }), e.label + " (" + e.msg + ") ", h("button", { type: "button", class: "ve-link", text: "Fix", onclick: function () { closeModal(); if (e.where === "car") openCarEditor(e.id); else if (e.where === "settings") openSettings(); else openReviews(); } })]));
+      ul.appendChild(h("li", null, [h("b", { text: e.name + ": " }), e.label + " (" + e.msg + ") ", h("button", { type: "button", class: "ve-link", text: "Fix", onclick: function () { closeModal(); if (e.where === "car") openCarEditor(e.id); else if (e.where === "settings") openSettings(); else if (e.where === "text") openTextKey(e.key); else openReviews(); } })]));
     });
     modal("Fix these before saving", ul, [h("button", { type: "button", class: "ve-btn pri", text: "OK", onclick: closeModal })]); return;
   }
@@ -540,7 +632,7 @@ async function doSave() {
     var ref = await gh("/git/ref/heads/" + encodeURIComponent(BRANCH));
     var changed = [];
     if (carChanges().added + carChanges().changed + carChanges().deleted) changed.push("cars");
-    ["settings", "calc", "reviews"].forEach(function (k) { if (fileChanged(k)) changed.push(k); });
+    ["settings", "calc", "reviews", "texts"].forEach(function (k) { if (fileChanged(k)) changed.push(k); });
     if (ref.object.sha !== S.headSha) {
       for (var i = 0; i < changed.length; i++) {
         var cur = await getFile(S.files[changed[i]].path);
@@ -584,7 +676,7 @@ async function doSave() {
 }
 
 /* ---------- start ---------- */
-var CSS = "body.ve-on{padding-bottom:72px}body.ve-on #totop,body.ve-on .cbn,body.ve-on .pvbar{display:none!important}#ve-root,#ve-root *{box-sizing:border-box}#ve-root{font:15px/1.4 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:#111}.ve-bar{position:fixed;left:0;right:0;bottom:0;z-index:9990;background:#191919;color:#fff;display:flex;align-items:center;gap:8px;padding:10px 14px;box-shadow:0 -6px 24px rgba(0,0,0,.45);flex-wrap:wrap}#ve-status{font-weight:600;font-size:14px;color:#cfd3d8}#ve-status.dirty{color:#ffb020}.ve-sp1{flex:1}.ve-btn{font:600 14px system-ui,sans-serif;border-radius:999px;border:1px solid #8a8f98;background:transparent;color:inherit;padding:9px 16px;cursor:pointer;white-space:nowrap}.ve-bar .ve-btn{color:#fff}.ve-btn.pri,.ve-bar .ve-btn.pri{background:#3665f3;border-color:#3665f3;color:#fff}.ve-btn.dng{border-color:#d0021b;color:#d0021b;background:#fff}.ve-btn.sm{padding:6px 12px;font-size:13px}.ve-btn[disabled]{opacity:.4;cursor:default}.ve-link{background:none;border:0;color:#3665f3;font:600 13px system-ui;cursor:pointer;text-decoration:underline;padding:4px}.ve-hide{display:none!important}.ve-panel{position:fixed;top:0;bottom:0;right:0;width:min(580px,100vw);background:#fff;color:#111;z-index:9995;transform:translateX(102%);transition:transform .22s ease;display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.4);visibility:hidden}.ve-panel.open{transform:none;visibility:visible}.ve-ph-h{display:flex;justify-content:space-between;gap:10px;padding:16px 20px;border-bottom:1px solid #e5e5e5}.ve-pt-t{font:700 20px system-ui}.ve-pt-s{font-size:13px;color:#666;margin-top:2px}.ve-x{background:none;border:0;font-size:20px;cursor:pointer;color:#333;width:36px;height:36px;border-radius:50%}.ve-x:hover{background:#eee}.ve-pb-b{flex:1;overflow:auto;padding:6px 20px 24px}.ve-pf{display:flex;gap:10px;align-items:center;padding:12px 20px;border-top:1px solid #e5e5e5;background:#fff}.ve-sec{padding:18px 0;border-bottom:1px solid #eee}.ve-sec h3{font:700 17px system-ui;margin:0 0 14px;letter-spacing:.2px;color:#111}.ve-f{margin:0 0 14px}.ve-l{display:block;font-size:13px;color:#555;margin:0 0 5px}.ve-f input[type=text],.ve-f select,.ve-f textarea{width:100%;font:15px system-ui;border:1px solid #c7c7c7;border-radius:8px;background:#f7f7f7;color:#111;padding:0 12px;height:44px}.ve-f textarea{height:auto;padding:10px 12px;resize:vertical}.ve-f input:focus,.ve-f select:focus,.ve-f textarea:focus{outline:2px solid #3665f3;background:#fff}.ve-f.bad input,.ve-f.bad select,.ve-f.bad textarea{border-color:#d0021b}.ve-e{color:#d0021b;font-size:12px;margin-top:3px}.ve-g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}@media(max-width:520px){.ve-g2{grid-template-columns:1fr}.ve-pg{grid-template-columns:repeat(3,minmax(0,1fr))!important}}.ve-row{display:flex;gap:8px;align-items:center}.ve-row input{flex:1;min-width:0}.ve-n{font-size:12px;color:#2a7d2e;margin-top:4px}.ve-cnt{font-size:13px;color:#666;margin-bottom:10px}.ve-pg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.ve-pt{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:#f1f1f1;cursor:grab}.ve-pt:first-child{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}.ve-pt img{width:100%;height:100%;object-fit:cover;display:block}.ve-nopic{display:flex;align-items:center;justify-content:center;text-align:center;height:100%;font-size:11px;color:#777;padding:6px}.ve-main{position:absolute;left:6px;top:6px;background:#111;color:#fff;font:700 12px system-ui;padding:3px 9px;border-radius:999px}.ve-pb{position:absolute;left:0;right:0;bottom:0;display:flex;gap:2px;justify-content:center;padding:4px;background:linear-gradient(0deg,rgba(0,0,0,.6),transparent)}.ve-pb button{background:rgba(255,255,255,.92);border:0;border-radius:6px;font-size:12px;width:28px;height:26px;cursor:pointer;color:#111}.ve-pb button[disabled]{opacity:.35;cursor:default}.ve-pb .x{color:#d0021b}.ve-pa{aspect-ratio:4/3;border:2px dashed #b9b9b9;border-radius:10px;background:#f7f7f7;cursor:pointer;font:600 13px system-ui;color:#333;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.ve-pa span{font-size:26px;line-height:1}.ve-sws{display:flex;flex-direction:column;gap:12px}.ve-sw{display:flex;gap:12px;align-items:flex-start;cursor:pointer;position:relative}.ve-sw input{position:absolute;opacity:0;pointer-events:none}.ve-knob{flex:none;width:44px;height:26px;border-radius:999px;background:#c7c7c7;position:relative;margin-top:2px;transition:background .15s}.ve-knob::after{content:\"\";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s}.ve-sw input:checked+.ve-knob{background:#3665f3}.ve-sw input:checked+.ve-knob::after{transform:translateX(18px)}.ve-sw input:focus-visible+.ve-knob{outline:2px solid #3665f3;outline-offset:2px}.ve-swt b{display:block;font-size:15px}.ve-swt small{color:#666;font-size:12px}.ve-menu{position:fixed;top:0;bottom:0;left:0;width:min(300px,86vw);background:#fff;color:#111;z-index:9996;transform:translateX(-102%);transition:transform .2s;box-shadow:10px 0 40px rgba(0,0,0,.4);padding:14px;display:flex;flex-direction:column;gap:4px;visibility:hidden}.ve-menu.open{transform:none;visibility:visible}.ve-mh{display:flex;justify-content:space-between;align-items:center;padding:4px 4px 12px;font-size:18px}.ve-mi{text-align:left;background:none;border:0;padding:13px 12px;border-radius:10px;font:600 15px system-ui;color:#111;cursor:pointer}.ve-mi:hover{background:#f0f3ff}.ve-hint{font-size:12px;color:#666;margin:auto 4px 6px}.ve-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px}.ve-modal.open{display:flex}.ve-login{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:16px}.ve-mc{background:#fff;color:#111;border-radius:16px;padding:22px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5);font:15px/1.45 system-ui;max-height:90vh;overflow:auto}.ve-mc h2{margin:0 0 10px;font:700 21px system-ui;color:#111}.ve-mc p{margin:8px 0}.ve-mf{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px}.ve-mc .ve-btn{border-color:#8a8f98;color:#111}.ve-mc .ve-btn.pri{color:#fff;border-color:#3665f3;background:#3665f3}.ve-mc .ve-btn.dng{color:#d0021b;border-color:#d0021b}.ve-sum{margin:6px 0 10px;padding-left:20px}.ve-sum li{margin:4px 0}.ve-sm{font-size:13px;color:#555}#ve-toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(20px);background:#111;color:#fff;padding:11px 18px;border-radius:999px;z-index:10000;font:600 14px system-ui;opacity:0;pointer-events:none;transition:all .2s;max-width:92vw;text-align:center}#ve-toast.show{opacity:1;transform:translateX(-50%)}#ve-toast.bad{background:#d0021b}.ve-rvp{display:block;max-width:160px;border-radius:8px;margin:0 0 8px}.ve-card{position:relative;cursor:pointer;outline:2px solid transparent;outline-offset:2px;transition:outline-color .15s}.ve-card:hover{outline-color:#3665f3}.ve-pen{position:absolute;top:10px;right:10px;z-index:5;background:#fff;color:#111;border-radius:999px;font:700 13px system-ui;padding:6px 12px;box-shadow:0 2px 8px rgba(0,0,0,.4)}.ve-hid{position:absolute;left:10px;top:10px;z-index:5;background:#111;color:#fff;border:1px solid #888;border-radius:999px;font:700 12px system-ui;padding:4px 10px}.card.is-hidden .pic{opacity:.4}.ve-addtile{min-height:260px;border:2px dashed #4a5260;border-radius:14px;background:rgba(255,255,255,.03);color:#c8ced6;font:600 16px system-ui;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}.ve-addtile span{font-size:38px;line-height:1}.ve-addtile:hover{border-color:#3665f3;color:#fff}.ve-sp{position:absolute;top:6px;right:6px;z-index:30;background:#fff;color:#111;border:0;border-radius:999px;font:700 13px system-ui;padding:7px 13px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.45)}.ve-sp:hover{background:#eef2ff}body.ve-prev .ve-sp{display:none}.ve-ph{margin-bottom:16px}.ve-sp.ve-in{position:static;align-self:center;margin-left:12px;white-space:nowrap}";
+var CSS = "body.ve-on{padding-bottom:72px}body.ve-on #totop,body.ve-on .cbn,body.ve-on .pvbar{display:none!important}#ve-root,#ve-root *{box-sizing:border-box}#ve-root{font:15px/1.4 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:#111}.ve-bar{position:fixed;left:0;right:0;bottom:0;z-index:9990;background:#191919;color:#fff;display:flex;align-items:center;gap:8px;padding:10px 14px;box-shadow:0 -6px 24px rgba(0,0,0,.45);flex-wrap:wrap}#ve-status{font-weight:600;font-size:14px;color:#cfd3d8}#ve-status.dirty{color:#ffb020}.ve-sp1{flex:1}.ve-btn{font:600 14px system-ui,sans-serif;border-radius:999px;border:1px solid #8a8f98;background:transparent;color:inherit;padding:9px 16px;cursor:pointer;white-space:nowrap}.ve-bar .ve-btn{color:#fff}.ve-btn.pri,.ve-bar .ve-btn.pri{background:#3665f3;border-color:#3665f3;color:#fff}.ve-btn.dng{border-color:#d0021b;color:#d0021b;background:#fff}.ve-btn.sm{padding:6px 12px;font-size:13px}.ve-btn[disabled]{opacity:.4;cursor:default}.ve-link{background:none;border:0;color:#3665f3;font:600 13px system-ui;cursor:pointer;text-decoration:underline;padding:4px}.ve-hide{display:none!important}.ve-panel{position:fixed;top:0;bottom:0;right:0;width:min(580px,100vw);background:#fff;color:#111;z-index:9995;transform:translateX(102%);transition:transform .22s ease;display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.4);visibility:hidden}.ve-panel.open{transform:none;visibility:visible}.ve-ph-h{display:flex;justify-content:space-between;gap:10px;padding:16px 20px;border-bottom:1px solid #e5e5e5}.ve-pt-t{font:700 20px system-ui}.ve-pt-s{font-size:13px;color:#666;margin-top:2px}.ve-x{background:none;border:0;font-size:20px;cursor:pointer;color:#333;width:36px;height:36px;border-radius:50%}.ve-x:hover{background:#eee}.ve-pb-b{flex:1;overflow:auto;padding:6px 20px 24px}.ve-pf{display:flex;gap:10px;align-items:center;padding:12px 20px;border-top:1px solid #e5e5e5;background:#fff}.ve-sec{padding:18px 0;border-bottom:1px solid #eee}.ve-sec h3{font:700 17px system-ui;margin:0 0 14px;letter-spacing:.2px;color:#111}.ve-f{margin:0 0 14px}.ve-l{display:block;font-size:13px;color:#555;margin:0 0 5px}.ve-f input[type=text],.ve-f select,.ve-f textarea{width:100%;font:15px system-ui;border:1px solid #c7c7c7;border-radius:8px;background:#f7f7f7;color:#111;padding:0 12px;height:44px}.ve-f textarea{height:auto;padding:10px 12px;resize:vertical}.ve-f input:focus,.ve-f select:focus,.ve-f textarea:focus{outline:2px solid #3665f3;background:#fff}.ve-f.bad input,.ve-f.bad select,.ve-f.bad textarea{border-color:#d0021b}.ve-e{color:#d0021b;font-size:12px;margin-top:3px}.ve-g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}@media(max-width:520px){.ve-g2{grid-template-columns:1fr}.ve-pg{grid-template-columns:repeat(3,minmax(0,1fr))!important}}.ve-row{display:flex;gap:8px;align-items:center}.ve-row input{flex:1;min-width:0}.ve-n{font-size:12px;color:#2a7d2e;margin-top:4px}.ve-cnt{font-size:13px;color:#666;margin-bottom:10px}.ve-pg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.ve-pt{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:#f1f1f1;cursor:grab}.ve-pt:first-child{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}.ve-pt img{width:100%;height:100%;object-fit:cover;display:block}.ve-nopic{display:flex;align-items:center;justify-content:center;text-align:center;height:100%;font-size:11px;color:#777;padding:6px}.ve-main{position:absolute;left:6px;top:6px;background:#111;color:#fff;font:700 12px system-ui;padding:3px 9px;border-radius:999px}.ve-pb{position:absolute;left:0;right:0;bottom:0;display:flex;gap:2px;justify-content:center;padding:4px;background:linear-gradient(0deg,rgba(0,0,0,.6),transparent)}.ve-pb button{background:rgba(255,255,255,.92);border:0;border-radius:6px;font-size:12px;width:28px;height:26px;cursor:pointer;color:#111}.ve-pb button[disabled]{opacity:.35;cursor:default}.ve-pb .x{color:#d0021b}.ve-pa{aspect-ratio:4/3;border:2px dashed #b9b9b9;border-radius:10px;background:#f7f7f7;cursor:pointer;font:600 13px system-ui;color:#333;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.ve-pa span{font-size:26px;line-height:1}.ve-sws{display:flex;flex-direction:column;gap:12px}.ve-sw{display:flex;gap:12px;align-items:flex-start;cursor:pointer;position:relative}.ve-sw input{position:absolute;opacity:0;pointer-events:none}.ve-knob{flex:none;width:44px;height:26px;border-radius:999px;background:#c7c7c7;position:relative;margin-top:2px;transition:background .15s}.ve-knob::after{content:\"\";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s}.ve-sw input:checked+.ve-knob{background:#3665f3}.ve-sw input:checked+.ve-knob::after{transform:translateX(18px)}.ve-sw input:focus-visible+.ve-knob{outline:2px solid #3665f3;outline-offset:2px}.ve-swt b{display:block;font-size:15px}.ve-swt small{color:#666;font-size:12px}.ve-menu{position:fixed;top:0;bottom:0;left:0;width:min(300px,86vw);background:#fff;color:#111;z-index:9996;transform:translateX(-102%);transition:transform .2s;box-shadow:10px 0 40px rgba(0,0,0,.4);padding:14px;display:flex;flex-direction:column;gap:4px;visibility:hidden}.ve-menu.open{transform:none;visibility:visible}.ve-mh{display:flex;justify-content:space-between;align-items:center;padding:4px 4px 12px;font-size:18px}.ve-mi{text-align:left;background:none;border:0;padding:13px 12px;border-radius:10px;font:600 15px system-ui;color:#111;cursor:pointer}.ve-mi:hover{background:#f0f3ff}.ve-hint{font-size:12px;color:#666;margin:auto 4px 6px}.ve-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px}.ve-modal.open{display:flex}.ve-login{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:16px}.ve-mc{background:#fff;color:#111;border-radius:16px;padding:22px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5);font:15px/1.45 system-ui;max-height:90vh;overflow:auto}.ve-mc h2{margin:0 0 10px;font:700 21px system-ui;color:#111}.ve-mc p{margin:8px 0}.ve-mf{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px}.ve-mc .ve-btn{border-color:#8a8f98;color:#111}.ve-mc .ve-btn.pri{color:#fff;border-color:#3665f3;background:#3665f3}.ve-mc .ve-btn.dng{color:#d0021b;border-color:#d0021b}.ve-sum{margin:6px 0 10px;padding-left:20px}.ve-sum li{margin:4px 0}.ve-sm{font-size:13px;color:#555}#ve-toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(20px);background:#111;color:#fff;padding:11px 18px;border-radius:999px;z-index:10000;font:600 14px system-ui;opacity:0;pointer-events:none;transition:all .2s;max-width:92vw;text-align:center}#ve-toast.show{opacity:1;transform:translateX(-50%)}#ve-toast.bad{background:#d0021b}.ve-rvp{display:block;max-width:160px;border-radius:8px;margin:0 0 8px}.ve-card{position:relative;cursor:pointer;outline:2px solid transparent;outline-offset:2px;transition:outline-color .15s}.ve-card:hover{outline-color:#3665f3}.ve-pen{position:absolute;top:10px;right:10px;z-index:5;background:#fff;color:#111;border-radius:999px;font:700 13px system-ui;padding:6px 12px;box-shadow:0 2px 8px rgba(0,0,0,.4)}.ve-hid{position:absolute;left:10px;top:10px;z-index:5;background:#111;color:#fff;border:1px solid #888;border-radius:999px;font:700 12px system-ui;padding:4px 10px}.card.is-hidden .pic{opacity:.4}.ve-addtile{min-height:260px;border:2px dashed #4a5260;border-radius:14px;background:rgba(255,255,255,.03);color:#c8ced6;font:600 16px system-ui;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}.ve-addtile span{font-size:38px;line-height:1}.ve-addtile:hover{border-color:#3665f3;color:#fff}.ve-sp{position:absolute;top:6px;right:6px;z-index:30;background:#fff;color:#111;border:0;border-radius:999px;font:700 13px system-ui;padding:7px 13px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.45)}.ve-sp:hover{background:#eef2ff}body.ve-prev .ve-sp{display:none}.ve-ph{margin-bottom:16px}.ve-sp.ve-in{position:static;align-self:center;margin-left:12px;white-space:nowrap}body.ve-txm [data-i]:not(dialog *){outline:1.5px dashed #5b86ff;outline-offset:3px;cursor:text}body.ve-txm [data-i]:not(dialog *):hover{background:rgba(54,101,243,.22)}.ve-gh{font:700 12px system-ui;color:#555;text-transform:uppercase;letter-spacing:.6px;margin:18px 0 6px}.ve-ti{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;background:#f7f7f7;border:1px solid #e3e3e3;border-radius:10px;padding:10px 12px;margin:0 0 6px;font:14px system-ui;color:#111;cursor:pointer}.ve-ti:hover{border-color:#3665f3;background:#f0f3ff}.ve-ed{font:700 11px system-ui;background:#3665f3;color:#fff;border-radius:999px;padding:2px 8px;flex:none;align-self:center}.ve-bar #ve-tx.on{background:#ffb020;border-color:#ffb020;color:#111}";
 function css() { var s = document.createElement("style"); s.id = "ve-css"; s.textContent = CSS; document.head.appendChild(s); }
 function loginView(note) {
   var old = $("#ve-login"); if (old) old.remove();
@@ -617,7 +709,8 @@ async function start() {
   g.addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && e.target.classList && e.target.classList.contains("card") && !S.preview) { e.preventDefault(); e.stopPropagation(); openCarEditor(+e.target.dataset.vid); } }, true);
   var _draw = window.draw; window.draw = function () { _draw.apply(this, arguments); decorate(); };
   window.track = function () { };
-  applyView(); applySettings(); applyCalc(); applyReviews(); updateBar();
+  applyView(); applySettings(); applyCalc(); applyReviews(); applyTextsView(); updateBar();
+  document.addEventListener("click", textClick, true);
   toast("Editing mode. Click a car or a pencil.");
 }
 (async function boot() {
