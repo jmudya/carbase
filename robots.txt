@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /edit/
+Disallow: /api/
 
 Sitemap: https://carbaseusa.com/sitemap.xml

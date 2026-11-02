@@ -73,6 +73,7 @@ collections:
           - {label: "Form email access key (from web3forms.com)", name: wk, widget: string, required: false}
           - {label: 'Google reviews widget code (paste the embed code from Elfsight, Trustindex, Featurable or a similar service, optional)', name: rv_embed, widget: text, required: false}
           - {label: 'Google review link (your Google Business Profile review link, optional)', name: gr, widget: string, required: false}
+          - {label: 'Google Place ID (shows your Google reviews automatically, see the instruction; leave empty to turn off)', name: gpid, widget: string, required: false, pattern: ['^[A-Za-z0-9_-]{10,200}$', 'Place ID looks like ChIJ... (letters, digits, _ and -)']}
           - label: "Google Analytics ID (looks like G-XXXXXXXXXX)"
             name: ga
             widget: string
