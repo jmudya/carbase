@@ -829,7 +829,7 @@ ad("ty_h","Thank you!","Дякуємо!","Спасибо!");ad("ty_t","We receiv
 function track(n,p){try{if(window.gtag)window.gtag("event",n,p||{})}catch(e){}}
 function initGA(){
 var id=String(cfg.ga||"").trim();
-try{if(/(^|[?&])notrack=1/.test(location.search))localStorage.setItem("cbno","1")}catch(e){}
+try{if(/(^|[?&])(notrack|edit)=1/.test(location.search))localStorage.setItem("cbno","1")}catch(e){}
 try{if(localStorage.getItem("cbno")==="1")return}catch(e){}
 if(!/^G-[A-Za-z0-9]+$/.test(id))return;
 var tz="";try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||""}catch(e){}
@@ -1200,7 +1200,7 @@ document.querySelectorAll("[data-ph]").forEach(function(e){e.placeholder=ts(e.da
 chipsDraw();draw();renderCfg();renderReviews();usEst();inCalc();navUpd();G("totop").setAttribute("aria-label",ts("totop"));G("totop").title=ts("totop")}
 document.querySelectorAll(".lb2 button").forEach(function(b){b.onclick=function(){L=b.dataset.l;track("change_language",{lang:L});try{localStorage.setItem("cblang",L)}catch(e){}applyLang()}});
 applyLang();
-Promise.all([fetch("data/cars.json").then(function(r){return r.json()}),fetch("data/settings.json").then(function(r){return r.json()}),jf("data/calc.json"),jf("data/reviews.json")]).then(function(r){cars=(r[0].cars||[]).filter(function(c){return !c.hide}).sort(function(a,b){function r(c){return c.sold?2:(c.pending?1:0)}return r(a)-r(b)});normCars(cars);cfg=r[1]||{};CALC=r[2]||{};RV=(r[3]&&r[3].reviews)||[]}).catch(function(){}).then(function(){var y=new Date().getFullYear(),o="";for(var i=y+1;i>=y-30;i--)o+="<option"+(i===y-8?" selected":"")+">"+i+"</option>";G("in_year").innerHTML=o;if(!G("us_from").value)G("us_from").value=String((CALC.ship&&CALC.ship.from_zip)||"34689");applyLang();initAdmin();initGA();bindInputs();openFromUrl()});
+Promise.all([fetch("data/cars.json").then(function(r){return r.json()}),fetch("data/settings.json").then(function(r){return r.json()}),jf("data/calc.json"),jf("data/reviews.json")]).then(function(r){cars=(r[0].cars||[]).filter(function(c){return !c.hide}).sort(function(a,b){function r(c){return c.sold?2:(c.pending?1:0)}return r(a)-r(b)});normCars(cars);cfg=r[1]||{};CALC=r[2]||{};RV=(r[3]&&r[3].reviews)||[]}).catch(function(){}).then(function(){var y=new Date().getFullYear(),o="";for(var i=y+1;i>=y-30;i--)o+="<option"+(i===y-8?" selected":"")+">"+i+"</option>";G("in_year").innerHTML=o;if(!G("us_from").value)G("us_from").value=String((CALC.ship&&CALC.ship.from_zip)||"34689");applyLang();initAdmin();initGA();bindInputs();openFromUrl();window.__siteReady=true});
 </script>
 
 
@@ -1214,4 +1214,4 @@ Promise.all([fetch("data/cars.json").then(function(r){return r.json()}),fetch("d
 if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)return;
 function start(){clearInterval(t);t=setInterval(function(){i=(i+1)%L.length;h.dataset.car=L[i]},8000)}
 document.addEventListener("visibilitychange",function(){if(document.hidden)clearInterval(t);else start()});start()})();</script><form name="shipping-world" data-netlify="true" netlify-honeypot="bot-field" hidden><input name="vehicle"><input name="country"><input name="city"><input name="condition"><input name="delivery"><input name="name"><input name="phone"><input name="email"><input name="notes"><input name="bot-field"></form>
-</body></html>
+<script>if(/[?&]edit=1(&|$)/.test(location.search)){var ve=document.createElement("script");ve.src="/edit/editor.js";document.body.appendChild(ve)}</script></body></html>
