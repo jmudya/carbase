@@ -33,7 +33,7 @@
         "/uploads/car4-19.jpg"
       ],
       "t": "Truck",
-      "sold": false,
+      "sold": true,
       "v": "",
       "fuel": "Gasoline",
       "title": "Clean",
