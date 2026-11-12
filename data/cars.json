@@ -52,7 +52,7 @@
       "battery_kwh": "",
       "m": "F-150 XLT 4X4 POWERBOOST",
       "dr": "4x4",
-      "p": 28900,
+      "p": 27666,
       "imgs": [
         "/uploads/1ftfw1ed6pfd08887-mvjy7n9y-1.jpg",
         "/uploads/1ftfw1ed6pfd08887-mvjy7n9y-2.jpg",
@@ -131,7 +131,7 @@
       "battery_type": "NCA",
       "m": "Model 3 Long Range Sedan 4D",
       "dr": "AWD",
-      "p": 19000,
+      "p": 18999,
       "imgs": [
         "/uploads/5yj3e1eb5mf975115-mv8xjfyp-1.jpg",
         "/uploads/5yj3e1eb5mf975115-mv8xjfyp-2.jpg",
@@ -199,21 +199,19 @@
       "battery_type": "LFP",
       "m": "Model 3 (Rear-Wheel Drive / Standard Range)",
       "dr": "RWD",
-      "p": 21000,
+      "p": 19999,
       "imgs": [
         "/uploads/5yj3e1ea8pf700253-mv8zhzo8-1.jpg",
         "/uploads/5yj3e1ea8pf700253-mv8zhzo8-2.jpg",
         "/uploads/5yj3e1ea8pf700253-mv8zhzo8-3.jpg",
         "/uploads/5yj3e1ea8pf700253-mv8zhzo8-4.jpg",
         "/uploads/5yj3e1ea8pf700253-mv8zhzo8-5.jpg",
-        "/uploads/5yj3e1ea8pf700253-mv8zhzo8-6.jpg",
         "/uploads/5yj3e1ea8pf700253-mv8zhzo8-7.jpg",
         "/uploads/5yj3e1ea8pf700253-mv8zhzo8-8.jpg",
         "/uploads/5yj3e1ea8pf700253-mv8zhzo8-9.jpg",
         "/uploads/5yj3e1ea8pf700253-mv8zhzo8-10.jpg",
         "/uploads/5yj3e1ea8pf700253-mv8zhzo8-11.jpg",
-        "/uploads/5yj3e1ea8pf700253-mv8zhzo8-12.jpg",
-        "/uploads/5yj3e1ea8pf700253-mv8zhzo8-13.jpg"
+        "/uploads/5yj3e1ea8pf700253-mv8zhzo8-12.jpg"
       ],
       "t": "EV",
       "sold": false,
