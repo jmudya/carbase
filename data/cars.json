@@ -7,7 +7,6 @@
       "wsticker": "/uploads/789926008_3449228908571310_391715658009705711_n.jpg",
       "towing": 13000,
       "hp": 400,
-      "carfax": "/uploads/ford-f150-2023-1ftew1c55pkd73809.pdf",
       "m": "F-150 XLT Pickup 4D 5 1/2 ft",
       "dr": "RWD",
       "p": 27000,
@@ -40,7 +39,8 @@
       "y": 2023,
       "vin": "1FTEW1C55PKD73809",
       "mi": 39700,
-      "tr": "Automatic"
+      "tr": "Automatic",
+      "carfax": "/uploads/1ftew1c55pkd73809-mwdv8os2-8.pdf"
     },
     {
       "b": "Ford ",
@@ -84,13 +84,13 @@
       "vin": "1FTFW1ED6PFD08887",
       "warranty": true,
       "mi": 39100,
-      "tr": "Automatic"
+      "tr": "Automatic",
+      "carfax": "/uploads/1ftfw1ed6pfd08887-mwdv6zz4-5.pdf"
     },
     {
       "b": "Tesla ",
       "c": "BLACK",
       "hp": 295,
-      "carfax": "/uploads/tesla-3-2025-black-5yj3e1ea3sf940674.pdf",
       "battery_kwh": 77.8,
       "battery_type": "NCA",
       "m": "Model 3 Long Range Premium",
@@ -119,14 +119,14 @@
       "y": 2025,
       "vin": "5YJ3E1EA3SF940674",
       "mi": 19000,
-      "tr": ""
+      "tr": "",
+      "carfax": "/uploads/5yj3e1ea3sf940674-mwdv89an-7.pdf"
     },
     {
       "b": "Tesla ",
       "c": "Grey",
       "e": "Dual motor, electric",
       "hp": 0,
-      "carfax": "/uploads/tesla-3-2021-5yj3e1eb5mf975115.pdf",
       "battery_kwh": 82,
       "battery_type": "NCA",
       "m": "Model 3 Long Range Sedan 4D",
@@ -149,7 +149,8 @@
       "y": 2021,
       "vin": "5YJ3E1EB5MF975115",
       "mi": 68500,
-      "tr": "Single-speed"
+      "tr": "Single-speed",
+      "carfax": "/uploads/5yj3e1eb5mf975115-mwdv6l0r-4.pdf"
     },
     {
       "b": "FORD",
@@ -194,7 +195,6 @@
       "c": "Gray",
       "e": "Electric Motor",
       "hp": 271,
-      "carfax": "/uploads/tesla-3-5yj3e1ea8pf700253.pdf",
       "battery_kwh": 60,
       "battery_type": "LFP",
       "m": "Model 3 (Rear-Wheel Drive / Standard Range)",
@@ -220,14 +220,14 @@
       "y": 2023,
       "vin": "5YJ3E1EA8PF700253",
       "mi": 48299,
-      "tr": "1-speed fixed gear"
+      "tr": "1-speed fixed gear",
+      "carfax": "/uploads/5yj3e1ea8pf700253-mwdva2p5-10.pdf"
     },
     {
       "b": "Tesla",
       "c": "Blue",
       "e": "Electric Motor",
       "hp": 271,
-      "carfax": "/uploads/tesla-3-blue-5yj3e1ea5pf422394.pdf",
       "battery_kwh": 60,
       "battery_type": "LFP",
       "m": "Model 3 (Rear-Wheel Drive / Standard Range)",
@@ -258,14 +258,15 @@
       "y": 2023,
       "vin": "5YJ3E1EA5PF422394",
       "mi": 77523,
-      "tr": "Transmission: 1-speed fixed gear"
+      "tr": "Transmission: 1-speed fixed gear",
+      "carfax": "/uploads/5yj3e1ea5pf422394-mwdv9exo-9.pdf"
     },
     {
       "b": "Tesla",
       "hide": false,
       "c": "WHIRTE",
       "hp": 425,
-      "carfax": "",
+      "carfax": "/uploads/5yj3e1eb6mf988276-mwdv5pny-3.pdf",
       "battery_kwh": 82,
       "battery_type": "NCA",
       "m": "Model 3 Long Range Dual Motor",
@@ -291,7 +292,6 @@
       "hide": false,
       "c": "WHITE",
       "hp": 390,
-      "carfax": "/uploads/скоро_-автомобиль-под-покрывалом.png",
       "battery_kwh": 82,
       "battery_type": "NCA",
       "m": "Model Y Long Range Dual Motor (HW4)",
@@ -310,7 +310,8 @@
       "vin": "7SAYGAEE4PF931561",
       "asis": false,
       "warranty": true,
-      "mi": 31000
+      "mi": 31000,
+      "carfax": "/uploads/7saygaee4pf931561-mwdv7l20-6.pdf"
     },
     {
       "b": "Tesla",
@@ -341,7 +342,6 @@
       "c": "Grey",
       "e": "2.0L I4 Hybrid (Atkinson cycle) + electric motor",
       "hp": 195,
-      "carfax": "/uploads/honda-1hgcr6f54ea006038.pdf",
       "m": "Accord Hybrid EX-L",
       "dr": "FWD",
       "p": 7000,
@@ -364,14 +364,14 @@
       "y": 2014,
       "vin": "1HGCR6F54EA006038",
       "mi": 131223,
-      "tr": "e-CVT"
+      "tr": "e-CVT",
+      "carfax": "/uploads/1hgcr6f54ea006038-mwdv3tq1-2.pdf"
     },
     {
       "b": "Lexus ",
       "c": "Black",
       "e": "Engine: 2.5L I4 F DOHC 16V",
       "hp": 200,
-      "carfax": "/uploads/carfax_vehicle_history_report_for_this_2013_lexus_es_300h_jthbw1gg2d2023143.pdf",
       "m": "ES 300H",
       "dr": "FWD",
       "p": 7200,
@@ -399,7 +399,8 @@
       "y": 2013,
       "vin": "JTHBW1GG2D2023143",
       "mi": 197950,
-      "tr": "CVT"
+      "tr": "CVT",
+      "carfax": "/uploads/jthbw1gg2d2023143-mwdv3ahy-1.pdf"
     }
   ]
 }
