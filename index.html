@@ -115,7 +115,8 @@ button.btn.alt{border:1px solid var(--line);color:var(--text)}
 #adminbar button{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:4px;padding:8px 12px;font:600 14px var(--body);cursor:pointer}
 body:has(#adminbar:not([hidden])) footer{padding-bottom:90px}
 .fld{display:block;margin-bottom:12px;color:var(--muted);font-size:14px}
-.fld input,.fld select{display:block;width:100%;margin-top:4px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:4px;padding:10px 12px;font:inherit;font-size:16px}
+.fld input,.fld select{display:block;width:100%;margin-top:4px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font:inherit;font-size:16px;transition:border-color .15s,box-shadow .15s}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:0;border-color:#5b616b;box-shadow:0 0 0 3px rgba(226,59,46,.22)}
 .row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
 .pv{height:120px;border-radius:6px;overflow:hidden;margin-bottom:10px;background:linear-gradient(135deg,#2b3038,#14171b);display:flex;align-items:center;justify-content:center}
 .pv svg{height:100%;width:100%}.pv img{width:100%;height:100%;object-fit:cover}
@@ -364,6 +365,23 @@ dialog#shm::backdrop{background:rgba(0,0,0,.68)}
 .dst .fld{max-width:340px}
 .wd-list{margin:10px 0 14px;padding-left:20px;color:var(--text)}
 .wd-list li{margin:0 0 8px}
+/* Dropdown lists: rounded, in the site colours, short (scrolls), no blue. Browsers without customizable selects keep their own list. */
+@supports not (appearance:base-select){select{color-scheme:dark}select option{background:#171a1f;color:var(--text)}}
+@supports (appearance:base-select){
+select:not(#ve-root *),select:not(#ve-root *)::picker(select){appearance:base-select}
+select:not(#ve-root *){display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;text-align:left;white-space:nowrap}
+select:not(#ve-root *)::picker-icon{content:"";flex:none;width:9px;height:9px;margin:0 2px 0 8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translateY(-3px) rotate(45deg);transition:transform .2s ease}
+select:not(#ve-root *):open::picker-icon{transform:translateY(2px) rotate(225deg)}
+select:not(#ve-root *)::picker(select){border:1px solid #343a44;border-radius:16px;background:#171a1f;color:var(--text);padding:6px;margin-top:6px;box-shadow:0 22px 54px rgba(0,0,0,.65);min-inline-size:anchor-size(width);max-inline-size:min(92vw,520px);max-block-size:min(280px,45vh);overflow-y:auto;scrollbar-width:thin;scrollbar-color:#454c57 transparent;opacity:0;transform:translateY(-6px);transition:opacity .16s ease,transform .16s ease,overlay .16s allow-discrete,display .16s allow-discrete}
+select:not(#ve-root *)::picker(select):popover-open{opacity:1;transform:none}
+@starting-style{select:not(#ve-root *)::picker(select):popover-open{opacity:0;transform:translateY(-6px)}}
+select:not(#ve-root *) option{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:11px;font:inherit;font-size:16px;line-height:1.3;color:var(--text);cursor:pointer;white-space:normal;transition:background .12s}
+select:not(#ve-root *) option:hover,select:not(#ve-root *) option:focus-visible{background:rgba(255,255,255,.09);outline:0}
+select:not(#ve-root *) option:checked{background:rgba(226,59,46,.2);color:#fff;font-weight:600}
+select:not(#ve-root *) option::checkmark{content:"\2713";order:2;margin-left:auto;color:var(--red);font-weight:700}
+select:not(#ve-root *) option:disabled{opacity:.45;cursor:not-allowed}
+select:not(#ve-root *):disabled{cursor:not-allowed}
+}
 .cbn{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:60;max-width:640px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:#1b1f25;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.5);font-size:15px}
 .cbb{display:flex;gap:8px}
 .cbb .btn{margin:0;padding:9px 16px;font-size:15px}
