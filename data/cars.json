@@ -215,7 +215,7 @@
         "/uploads/5yj3e1ea8pf700253-mv8zhzo8-12.jpg"
       ],
       "t": "EV",
-      "sold": false,
+      "sold": true,
       "fuel": "Electric",
       "title": "Clean",
       "y": 2023,
