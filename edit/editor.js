@@ -64,6 +64,7 @@ async function load() {
   S.extra = Object.assign({}, cd); delete S.extra.cars;
   S.cars = (cd.cars || []).map(function (d) { return { id: S.nid++, d: d }; });
   S.origCars = {}; S.cars.forEach(function (x) { S.origCars[x.id] = JSON.stringify(x.d); });
+  S.origOrder = S.cars.map(function (x) { return x.id; });
   S.files = {
     cars: { path: "data/cars.json", sha: r[0].sha },
     settings: { path: "data/settings.json", sha: r[1].sha, data: r[1].data || {} },
@@ -84,9 +85,14 @@ function carChanges() {
   Object.keys(S.origCars).forEach(function (id) { if (!seen[id]) deleted++; });
   return { added: added, changed: changed, deleted: deleted };
 }
+function orderChanged() {
+  var now = S.cars.map(function (x) { return x.id; }).filter(function (id) { return id in S.origCars; });
+  var was = (S.origOrder || []).filter(function (id) { return now.indexOf(id) > -1; });
+  return now.join(",") !== was.join(",");
+}
 function fileChanged(k) { var f = S.files[k]; return JSON.stringify(f.data) !== f.orig; }
 function carsFileData() { var o = Object.assign({}, S.extra); o.cars = S.cars.map(function (x) { return x.d; }); return o; }
-function dirtyCount() { var c = carChanges(); return c.added + c.changed + c.deleted + ["settings", "calc", "reviews", "texts"].filter(fileChanged).length; }
+function dirtyCount() { var c = carChanges(); return c.added + c.changed + c.deleted + (orderChanged() ? 1 : 0) + ["settings", "calc", "reviews", "texts"].filter(fileChanged).length; }
 function usedUploads() {
   var txt = JSON.stringify([carsFileData(), S.files.settings.data, S.files.calc.data, S.files.reviews.data]);
   return Object.keys(S.uploads).filter(function (p) { return !S.uploads[p].done && txt.indexOf('"/' + p + '"') > -1; });
@@ -407,6 +413,8 @@ function openReviews() {
   var arr = S.files.reviews.data.reviews;
   function render() {
     sh.body.innerHTML = "";
+    var gn = window.GREV && window.GREV.reviews ? window.GREV.reviews.length : 0;
+    if (gn) sh.body.appendChild(h("p", { class: "ve-sm", style: "margin-top:14px", text: gn + " review" + (gn > 1 ? "s" : "") + " from Google " + (gn > 1 ? "are" : "is") + " loaded automatically and shown on the site before the ones below. They cannot be edited here." }));
     arr.forEach(function (r, i) {
       var kids = ["name", "loc", "rating", "text", "date", "car", "video"].map(function (k) { return field(SCHEMA.reviews[k], r, function () { touch("reviews"); }, k === "text" ? { rows: 4 } : {}); });
       var ph = h("div", { class: "ve-f" }), pl = h("label", { class: "ve-l", text: "Photo (optional)" });
@@ -548,15 +556,63 @@ function decorate() {
     var c = window.cars[+card.dataset.i]; if (!c) return;
     card.dataset.vid = c._id; card.classList.add("ve-card");
     card.appendChild(h("span", { class: "ve-pen", text: "✎ Edit" }));
+    card.appendChild(h("button", { type: "button", class: "ve-drag", title: "Drag to change the order", "aria-label": "Drag to change the order", html: "⠿ <small>Drag</small>", onpointerdown: dragStart }));
     if (c.hide) { card.classList.add("is-hidden"); card.appendChild(h("span", { class: "ve-hid", text: "Hidden on the site" })); }
   });
   g.appendChild(h("button", { type: "button", class: "ve-addtile", html: "<span>+</span>Add car" }));
 }
 function gridClick(e) {
   if (S.preview) return;
+  if (e.target.closest(".ve-drag")) { e.preventDefault(); e.stopPropagation(); return; }
   var add = e.target.closest(".ve-addtile"), card = e.target.closest(".card");
   if (add) { e.preventDefault(); e.stopPropagation(); addCar(); return; }
   if (card && card.dataset.vid) { e.preventDefault(); e.stopPropagation(); openCarEditor(+card.dataset.vid); }
+}
+function carRank(c) { return c.sold ? 2 : (c.pending ? 1 : 0); }
+var DR = null;
+function dragStart(e) {
+  if (S.preview || S.busy || (e.button != null && e.button > 0)) return;
+  var card = e.currentTarget.closest(".card"); if (!card) return;
+  e.preventDefault(); e.stopPropagation();
+  DR = { card: card, id: +card.dataset.vid, x: e.clientX, y: e.clientY, sy: window.scrollY, over: null, raf: 0, pid: e.pointerId };
+  card.classList.add("ve-dragging"); document.body.classList.add("ve-dnd");
+  try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) { }
+  document.addEventListener("pointermove", dragMove, true); document.addEventListener("pointerup", dragEnd, true); document.addEventListener("pointercancel", dragCancel, true);
+  dragTick();
+}
+function dragMove(e) { if (!DR) return; e.preventDefault(); DR.cx = e.clientX; DR.cy = e.clientY; dragPaint(); }
+function dragPaint() {
+  if (!DR || DR.cx == null) return;
+  DR.card.style.transform = "translate(" + (DR.cx - DR.x) + "px," + (DR.cy - DR.y + (window.scrollY - DR.sy)) + "px)";
+  var el = document.elementFromPoint(DR.cx, DR.cy), t = el && el.closest ? el.closest("#grid .card") : null;
+  if (t === DR.card) t = null;
+  if (DR.over && DR.over !== t) DR.over.classList.remove("ve-over");
+  DR.over = t; if (t) t.classList.add("ve-over");
+}
+function dragTick() {
+  if (!DR) return;
+  var ey = DR.cy, step = 0;
+  if (ey != null) { if (ey < 90) step = -Math.ceil((90 - ey) / 6); else if (ey > window.innerHeight - 90) step = Math.ceil((ey - (window.innerHeight - 90)) / 6); }
+  if (step) { window.scrollBy(0, step); dragPaint(); }
+  DR.raf = requestAnimationFrame(dragTick);
+}
+function dragClean() {
+  if (!DR) return;
+  cancelAnimationFrame(DR.raf); DR.card.classList.remove("ve-dragging"); DR.card.style.transform = "";
+  if (DR.over) DR.over.classList.remove("ve-over");
+  document.body.classList.remove("ve-dnd");
+  document.removeEventListener("pointermove", dragMove, true); document.removeEventListener("pointerup", dragEnd, true); document.removeEventListener("pointercancel", dragCancel, true);
+}
+function dragCancel() { dragClean(); DR = null; }
+function dragEnd() {
+  if (!DR) return;
+  var from = DR.id, to = DR.over ? +DR.over.dataset.vid : null; dragClean(); DR = null;
+  if (to == null || to === from) return;
+  var fi = -1, ti = -1; S.cars.forEach(function (x, i) { if (x.id === from) fi = i; if (x.id === to) ti = i; });
+  if (fi < 0 || ti < 0) return;
+  if (carRank(S.cars[fi].d) !== carRank(S.cars[ti].d)) { toast("Available, pending and sold cars keep their groups. Drag within the same group.", true); return; }
+  var it = S.cars.splice(fi, 1)[0]; S.cars.splice(ti, 0, it);
+  applyView(); updateBar(); toast("Order changed. Press Save to keep it.");
 }
 function addPen(t, label, fn, inline) {
   if (!t || t.querySelector(":scope > .ve-sp")) return;
@@ -595,6 +651,7 @@ function summaryEl() {
   if (c.added) ul.appendChild(h("li", { text: c.added + " car" + (c.added > 1 ? "s" : "") + " added" }));
   if (c.changed) ul.appendChild(h("li", { text: c.changed + " car" + (c.changed > 1 ? "s" : "") + " changed" }));
   if (c.deleted) ul.appendChild(h("li", { text: c.deleted + " car" + (c.deleted > 1 ? "s" : "") + " deleted" }));
+  if (orderChanged()) ul.appendChild(h("li", { text: "Car order changed" }));
   if (fileChanged("settings")) ul.appendChild(h("li", { text: "Contacts and links changed" }));
   if (fileChanged("calc")) ul.appendChild(h("li", { text: "Delivery rates or warranty changed" }));
   if (fileChanged("reviews")) ul.appendChild(h("li", { text: "Customer reviews changed" }));
@@ -605,6 +662,7 @@ function summaryEl() {
 function commitMessage() {
   var c = carChanges(), p = [];
   if (c.added) p.push(c.added + " added"); if (c.changed) p.push(c.changed + " changed"); if (c.deleted) p.push(c.deleted + " deleted");
+  if (orderChanged()) p.push("reordered");
   var m = "Edit site: " + (p.length ? "cars " + p.join(", ") : "");
   var o = []; if (fileChanged("settings")) o.push("contacts"); if (fileChanged("calc")) o.push("rates"); if (fileChanged("reviews")) o.push("reviews"); if (fileChanged("texts")) o.push("texts");
   return (m + (p.length && o.length ? "; " : "") + o.join(", ")).replace(/: $/, "").trim();
@@ -631,7 +689,7 @@ async function doSave() {
     // somebody else may have changed the same file while we were editing
     var ref = await gh("/git/ref/heads/" + encodeURIComponent(BRANCH));
     var changed = [];
-    if (carChanges().added + carChanges().changed + carChanges().deleted) changed.push("cars");
+    if (carChanges().added + carChanges().changed + carChanges().deleted || orderChanged()) changed.push("cars");
     ["settings", "calc", "reviews", "texts"].forEach(function (k) { if (fileChanged(k)) changed.push(k); });
     if (ref.object.sha !== S.headSha) {
       for (var i = 0; i < changed.length; i++) {
@@ -658,7 +716,7 @@ async function doSave() {
     // the new state becomes the starting point
     for (var k = 0; k < changed.length; k++) {
       var key = changed[k], fresh = await getFile(S.files[key].path); S.files[key].sha = fresh.sha;
-      if (key === "cars") { S.origCars = {}; S.cars.forEach(function (x) { S.origCars[x.id] = JSON.stringify(x.d); }); } else S.files[key].orig = JSON.stringify(S.files[key].data);
+      if (key === "cars") { S.origCars = {}; S.cars.forEach(function (x) { S.origCars[x.id] = JSON.stringify(x.d); }); S.origOrder = S.cars.map(function (x) { return x.id; }); } else S.files[key].orig = JSON.stringify(S.files[key].data);
     }
     up.forEach(function (p) { S.uploads[p].done = true; });
     S.busy = false; updateBar();
@@ -677,7 +735,8 @@ async function doSave() {
 
 /* ---------- start ---------- */
 var CSS = "body.ve-on{padding-bottom:72px}body.ve-on #totop,body.ve-on .cbn,body.ve-on .pvbar{display:none!important}#ve-root,#ve-root *{box-sizing:border-box}#ve-root{font:15px/1.4 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:#111}.ve-bar{position:fixed;left:0;right:0;bottom:0;z-index:9990;background:#191919;color:#fff;display:flex;align-items:center;gap:8px;padding:10px 14px;box-shadow:0 -6px 24px rgba(0,0,0,.45);flex-wrap:wrap}#ve-status{font-weight:600;font-size:14px;color:#cfd3d8}#ve-status.dirty{color:#ffb020}.ve-sp1{flex:1}.ve-btn{font:600 14px system-ui,sans-serif;border-radius:999px;border:1px solid #8a8f98;background:transparent;color:inherit;padding:9px 16px;cursor:pointer;white-space:nowrap}.ve-bar .ve-btn{color:#fff}.ve-btn.pri,.ve-bar .ve-btn.pri{background:#3665f3;border-color:#3665f3;color:#fff}.ve-btn.dng{border-color:#d0021b;color:#d0021b;background:#fff}.ve-btn.sm{padding:6px 12px;font-size:13px}.ve-btn[disabled]{opacity:.4;cursor:default}.ve-link{background:none;border:0;color:#3665f3;font:600 13px system-ui;cursor:pointer;text-decoration:underline;padding:4px}.ve-hide{display:none!important}.ve-panel{position:fixed;top:0;bottom:0;right:0;width:min(580px,100vw);background:#fff;color:#111;z-index:9995;transform:translateX(102%);transition:transform .22s ease;display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.4);visibility:hidden}.ve-panel.open{transform:none;visibility:visible}.ve-ph-h{display:flex;justify-content:space-between;gap:10px;padding:16px 20px;border-bottom:1px solid #e5e5e5}.ve-pt-t{font:700 20px system-ui}.ve-pt-s{font-size:13px;color:#666;margin-top:2px}.ve-x{background:none;border:0;font-size:20px;cursor:pointer;color:#333;width:36px;height:36px;border-radius:50%}.ve-x:hover{background:#eee}.ve-pb-b{flex:1;overflow:auto;padding:6px 20px 24px}.ve-pf{display:flex;gap:10px;align-items:center;padding:12px 20px;border-top:1px solid #e5e5e5;background:#fff}.ve-sec{padding:18px 0;border-bottom:1px solid #eee}.ve-sec h3{font:700 17px system-ui;margin:0 0 14px;letter-spacing:.2px;color:#111}.ve-f{margin:0 0 14px}.ve-l{display:block;font-size:13px;color:#555;margin:0 0 5px}.ve-f input[type=text],.ve-f select,.ve-f textarea{width:100%;font:15px system-ui;border:1px solid #c7c7c7;border-radius:8px;background:#f7f7f7;color:#111;padding:0 12px;height:44px}.ve-f textarea{height:auto;padding:10px 12px;resize:vertical}.ve-f input:focus,.ve-f select:focus,.ve-f textarea:focus{outline:2px solid #3665f3;background:#fff}.ve-f.bad input,.ve-f.bad select,.ve-f.bad textarea{border-color:#d0021b}.ve-e{color:#d0021b;font-size:12px;margin-top:3px}.ve-g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}@media(max-width:520px){.ve-g2{grid-template-columns:1fr}.ve-pg{grid-template-columns:repeat(3,minmax(0,1fr))!important}}.ve-row{display:flex;gap:8px;align-items:center}.ve-row input{flex:1;min-width:0}.ve-n{font-size:12px;color:#2a7d2e;margin-top:4px}.ve-cnt{font-size:13px;color:#666;margin-bottom:10px}.ve-pg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.ve-pt{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:#f1f1f1;cursor:grab}.ve-pt:first-child{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}.ve-pt img{width:100%;height:100%;object-fit:cover;display:block}.ve-nopic{display:flex;align-items:center;justify-content:center;text-align:center;height:100%;font-size:11px;color:#777;padding:6px}.ve-main{position:absolute;left:6px;top:6px;background:#111;color:#fff;font:700 12px system-ui;padding:3px 9px;border-radius:999px}.ve-pb{position:absolute;left:0;right:0;bottom:0;display:flex;gap:2px;justify-content:center;padding:4px;background:linear-gradient(0deg,rgba(0,0,0,.6),transparent)}.ve-pb button{background:rgba(255,255,255,.92);border:0;border-radius:6px;font-size:12px;width:28px;height:26px;cursor:pointer;color:#111}.ve-pb button[disabled]{opacity:.35;cursor:default}.ve-pb .x{color:#d0021b}.ve-pa{aspect-ratio:4/3;border:2px dashed #b9b9b9;border-radius:10px;background:#f7f7f7;cursor:pointer;font:600 13px system-ui;color:#333;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.ve-pa span{font-size:26px;line-height:1}.ve-sws{display:flex;flex-direction:column;gap:12px}.ve-sw{display:flex;gap:12px;align-items:flex-start;cursor:pointer;position:relative}.ve-sw input{position:absolute;opacity:0;pointer-events:none}.ve-knob{flex:none;width:44px;height:26px;border-radius:999px;background:#c7c7c7;position:relative;margin-top:2px;transition:background .15s}.ve-knob::after{content:\"\";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s}.ve-sw input:checked+.ve-knob{background:#3665f3}.ve-sw input:checked+.ve-knob::after{transform:translateX(18px)}.ve-sw input:focus-visible+.ve-knob{outline:2px solid #3665f3;outline-offset:2px}.ve-swt b{display:block;font-size:15px}.ve-swt small{color:#666;font-size:12px}.ve-menu{position:fixed;top:0;bottom:0;left:0;width:min(300px,86vw);background:#fff;color:#111;z-index:9996;transform:translateX(-102%);transition:transform .2s;box-shadow:10px 0 40px rgba(0,0,0,.4);padding:14px;display:flex;flex-direction:column;gap:4px;visibility:hidden}.ve-menu.open{transform:none;visibility:visible}.ve-mh{display:flex;justify-content:space-between;align-items:center;padding:4px 4px 12px;font-size:18px}.ve-mi{text-align:left;background:none;border:0;padding:13px 12px;border-radius:10px;font:600 15px system-ui;color:#111;cursor:pointer}.ve-mi:hover{background:#f0f3ff}.ve-hint{font-size:12px;color:#666;margin:auto 4px 6px}.ve-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px}.ve-modal.open{display:flex}.ve-login{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:16px}.ve-mc{background:#fff;color:#111;border-radius:16px;padding:22px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5);font:15px/1.45 system-ui;max-height:90vh;overflow:auto}.ve-mc h2{margin:0 0 10px;font:700 21px system-ui;color:#111}.ve-mc p{margin:8px 0}.ve-mf{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px}.ve-mc .ve-btn{border-color:#8a8f98;color:#111}.ve-mc .ve-btn.pri{color:#fff;border-color:#3665f3;background:#3665f3}.ve-mc .ve-btn.dng{color:#d0021b;border-color:#d0021b}.ve-sum{margin:6px 0 10px;padding-left:20px}.ve-sum li{margin:4px 0}.ve-sm{font-size:13px;color:#555}#ve-toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(20px);background:#111;color:#fff;padding:11px 18px;border-radius:999px;z-index:10000;font:600 14px system-ui;opacity:0;pointer-events:none;transition:all .2s;max-width:92vw;text-align:center}#ve-toast.show{opacity:1;transform:translateX(-50%)}#ve-toast.bad{background:#d0021b}.ve-rvp{display:block;max-width:160px;border-radius:8px;margin:0 0 8px}.ve-card{position:relative;cursor:pointer;outline:2px solid transparent;outline-offset:2px;transition:outline-color .15s}.ve-card:hover{outline-color:#3665f3}.ve-pen{position:absolute;top:10px;right:10px;z-index:5;background:#fff;color:#111;border-radius:999px;font:700 13px system-ui;padding:6px 12px;box-shadow:0 2px 8px rgba(0,0,0,.4)}.ve-hid{position:absolute;left:10px;top:10px;z-index:5;background:#111;color:#fff;border:1px solid #888;border-radius:999px;font:700 12px system-ui;padding:4px 10px}.card.is-hidden .pic{opacity:.4}.ve-addtile{min-height:260px;border:2px dashed #4a5260;border-radius:14px;background:rgba(255,255,255,.03);color:#c8ced6;font:600 16px system-ui;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}.ve-addtile span{font-size:38px;line-height:1}.ve-addtile:hover{border-color:#3665f3;color:#fff}.ve-sp{position:absolute;top:6px;right:6px;z-index:30;background:#fff;color:#111;border:0;border-radius:999px;font:700 13px system-ui;padding:7px 13px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.45)}.ve-sp:hover{background:#eef2ff}body.ve-prev .ve-sp{display:none}.ve-ph{margin-bottom:16px}.ve-sp.ve-in{position:static;align-self:center;margin-left:12px;white-space:nowrap}body.ve-txm [data-i]:not(dialog *){outline:1.5px dashed #5b86ff;outline-offset:3px;cursor:text}body.ve-txm [data-i]:not(dialog *):hover{background:rgba(54,101,243,.22)}.ve-gh{font:700 12px system-ui;color:#555;text-transform:uppercase;letter-spacing:.6px;margin:18px 0 6px}.ve-ti{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;background:#f7f7f7;border:1px solid #e3e3e3;border-radius:10px;padding:10px 12px;margin:0 0 6px;font:14px system-ui;color:#111;cursor:pointer}.ve-ti:hover{border-color:#3665f3;background:#f0f3ff}.ve-ed{font:700 11px system-ui;background:#3665f3;color:#fff;border-radius:999px;padding:2px 8px;flex:none;align-self:center}.ve-bar #ve-tx.on{background:#ffb020;border-color:#ffb020;color:#111}";
-function css() { var s = document.createElement("style"); s.id = "ve-css"; s.textContent = CSS; document.head.appendChild(s); }
+var CSS2 = ".ve-drag{position:absolute;left:8px;top:8px;z-index:6;display:flex;align-items:center;gap:5px;padding:6px 10px;border:0;border-radius:6px;background:rgba(0,0,0,.72);color:#fff;font:600 13px system-ui,sans-serif;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}.ve-drag small{font:inherit}.ve-card{position:relative}.ve-card.ve-dragging{z-index:50;opacity:.9;box-shadow:0 18px 50px rgba(0,0,0,.6);pointer-events:none;transition:none}.ve-card.ve-over{outline:3px dashed #8b919b;outline-offset:-3px}body.ve-dnd,body.ve-dnd *{cursor:grabbing!important;user-select:none!important}";
+function css() { var s = document.createElement("style"); s.id = "ve-css"; s.textContent = CSS + CSS2; document.head.appendChild(s); }
 function loginView(note) {
   var old = $("#ve-login"); if (old) old.remove();
   var box = h("div", { id: "ve-login", class: "ve-login" }, [h("div", { class: "ve-mc" }, [
