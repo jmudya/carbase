@@ -1,6 +1,27 @@
 {
   "cars": [
     {
+      "y": 2021,
+      "title": "Clean",
+      "imgs": [
+        "/uploads/2026-mwo9wnp8-1.jpg",
+        "/uploads/2026-mwo9wrab-2.jpg"
+      ],
+      "b": "Tesla",
+      "m": "Model 3 Long Range Dual Motor",
+      "vin": "5YJ3E1EB9MF055570",
+      "t": "EV",
+      "mi": 46337,
+      "p": 21600,
+      "fuel": "Electric",
+      "c": "WHITE",
+      "battery_kwh": 82,
+      "battery_type": "NCA",
+      "hp": 420,
+      "dr": "AWD",
+      "warranty": true
+    },
+    {
       "b": "Ford",
       "c": "Skyblue",
       "e": "5.0L V8 F DOHC 32V",
