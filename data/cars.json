@@ -77,12 +77,11 @@
       ],
       "desc": "• $3,000+ in Upgraded Suspension\n• Custom FOX Suspension\n• BDS Upper Control Arms\n• Leather Seats\n• 360° Camera\n• Tow Package\n• 20” Wheels",
       "t": "Truck",
-      "sold": false,
+      "sold": true,
       "fuel": "Hybrid",
       "title": "Rebuilt",
       "y": 2023,
       "vin": "1FTFW1ED6PFD08887",
-      "warranty": true,
       "mi": 39100,
       "tr": "Automatic",
       "carfax": "/uploads/1ftfw1ed6pfd08887-mwdv6zz4-5.pdf"
